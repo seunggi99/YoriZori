@@ -7,7 +7,7 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
-/*
+
 @Entity
 @Getter @Setter
 public class RecipeCategory {
@@ -18,4 +18,3 @@ public class RecipeCategory {
 
     private String name;
 }
-*/

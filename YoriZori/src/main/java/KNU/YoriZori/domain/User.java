@@ -7,7 +7,7 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
+
 @Entity
 @Getter @Setter
 public class User {
@@ -16,10 +16,13 @@ public class User {
     @Column(name = "user_id")
     private Long Id;
 
+    private String name;
+
     private String password;
 
     private String nickname;
 
+    @OneToMany(mappedBy = "user")
     private List<Fridge> fridges = new ArrayList<>();
 }
-*/
+

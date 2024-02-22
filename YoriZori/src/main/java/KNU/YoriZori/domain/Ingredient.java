@@ -1,14 +1,15 @@
 package KNU.YoriZori.domain;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.context.annotation.EnableMBeanExport;
 
-/*
+import java.util.ArrayList;
+import java.util.List;
+
+
 @Entity
 @Getter @Setter
 public class Ingredient {
@@ -16,6 +17,16 @@ public class Ingredient {
     @Column(name = "ingredient_id")
     private Long id;
 
-    private Long expDate;
+    private String name;
+
+    private int defaultExpDate;
+
+    @OneToMany(mappedBy = "ingredient")
+    private List<PutIngredient> putIngredients = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "ingredient_category_id")
+    private IngredientCategory category;
+
 }
-*/
+

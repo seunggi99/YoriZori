@@ -1,12 +1,11 @@
 package KNU.YoriZori.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-/*
+
+import java.util.List;
+
 @Entity
 @Getter @Setter
 public class IngredientCategory {
@@ -16,4 +15,10 @@ public class IngredientCategory {
     private Long id;
 
     private String name;
-}*/
+
+    @OneToMany(mappedBy = "category")
+    private List<Ingredient> ingredients;
+    public List<Ingredient> getIngredients() {
+        return ingredients;
+    }
+}

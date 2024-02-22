@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 
-/*
+
 @Getter @Setter
 public class UserForm {
 
@@ -17,4 +17,4 @@ public class UserForm {
     @NotEmpty(message = "닉네임을 입력하세요")
     private String nickname;
 }
-*/
+
