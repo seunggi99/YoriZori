@@ -1,13 +1,11 @@
 package KNU.YoriZori.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,29 +14,34 @@ import java.util.List;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
-@Table
 @Getter @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Fridge {
     @Id
-    @GeneratedValue
     @Column(name = "fridge_id")
     private Long id;
 
-    @ManyToOne
+    @OneToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "fridge")
-    private List<PutIngredient> putIngredients = new ArrayList<>();
+    @OneToMany(mappedBy = "fridge", cascade = CascadeType.ALL)
+    private List<PutIn> putIns = new ArrayList<>();
 
-    @Temporal(TemporalType.DATE)
-    private Date putInDate;
+    public void setUser (User user){
+        this.user = user;
+        user.setFridge(this);
+    }
+    public void addPutIn(PutIn putIn){
+        putIns.add(putIn);
+        putIn.setFridge(this);
+    }
 
-    @Temporal(TemporalType.DATE)
-    private Date expDate;
+    public static Fridge createFridge(User user){
+        Fridge fridge = new Fridge();
+        fridge.setUser(user);
 
-    @Enumerated(EnumType.STRING)
-    private StoragePlace storagePlace;
+        return fridge;
+    }
+
 }
 

@@ -4,15 +4,14 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
+import static jakarta.persistence.FetchType.LAZY;
 
 
 @Entity
 @Getter @Setter
 public class User {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long Id;
 
@@ -22,7 +21,8 @@ public class User {
 
     private String nickname;
 
-    @OneToMany(mappedBy = "user")
-    private List<Fridge> fridges = new ArrayList<>();
+    @OneToOne(fetch = LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "fridge_id")
+    private Fridge fridge;
 }
 

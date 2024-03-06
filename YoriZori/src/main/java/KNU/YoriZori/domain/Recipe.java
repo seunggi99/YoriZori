@@ -7,12 +7,14 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 
 @Entity
 @Getter @Setter
 public class Recipe {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "recipe_id")
     private Long id;
 
@@ -28,8 +30,8 @@ public class Recipe {
     @OneToMany(mappedBy = "recipe")
     private List<RecipeIngredient> recipeIngredients = new ArrayList<>();
 
-    @ManyToOne
-    private RecipeCategory recipeCategory;
+    @ManyToOne(fetch = LAZY)
+    private RecipeCategory category;
 
 }
 
