@@ -1,5 +1,6 @@
 package KNU.YoriZori.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -24,6 +25,7 @@ public class PutIn {
     @JoinColumn(name = "ingredient_id")
     private Ingredient ingredient;
 
+    @JsonIgnore
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "fridge_id")
     private Fridge fridge;
@@ -36,8 +38,9 @@ public class PutIn {
     private StoragePlace storagePlace;
 
 
-    public static PutIn createPutIn(Ingredient ingredient, LocalDateTime putDate, StoragePlace storagePlace, LocalDateTime expdate){
+    public static PutIn createPutIn(Fridge fridge, Ingredient ingredient, LocalDateTime putDate, StoragePlace storagePlace){
         PutIn putIn = new PutIn();
+        putIn.setFridge(fridge);
         putIn.setIngredient(ingredient);
         putIn.setPutDate(putDate);
         putIn.setStoragePlace(storagePlace);

@@ -1,5 +1,6 @@
 package KNU.YoriZori.service;
 
+import KNU.YoriZori.domain.Fridge;
 import KNU.YoriZori.domain.User;
 import KNU.YoriZori.repository.FridgeRepository;
 import KNU.YoriZori.repository.UserRepository;
@@ -18,6 +19,7 @@ public class UserService {
     @Transactional
     public Long join(User user) {
         validateDuplicateMember(user); //중복 회원 검증
+        Fridge fridge = Fridge.createFridge(user); // 냉장고 생성 및 회원과 연결
         userRepository.save(user);
         return user.getId();
     }

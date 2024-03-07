@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-//@Transactional
+@Transactional
 public class UserServiceTest {
     @Autowired UserService userService;
     @Autowired UserRepository userRepository;
@@ -38,7 +38,7 @@ public class UserServiceTest {
 
         Fridge fridge = new Fridge();
 
-        fridgeService.join(fridge);
+        //fridgeService.join(fridge);
 
         user.setFridge(fridge);
         //then

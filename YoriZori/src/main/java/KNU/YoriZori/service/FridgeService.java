@@ -23,14 +23,6 @@ public class FridgeService {
     private final UserRepository userRepository;
     private final IngredientRepository ingredientRepository;
 
-
-
-    @Transactional
-    public Long join(Fridge fridge) {
-        fridgeRepository.save(fridge);
-        return fridge.getId();
-    }
-
     public Fridge findOne(Long fridgeId) {
         return fridgeRepository.findOne(fridgeId);
     }

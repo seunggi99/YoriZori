@@ -1,5 +1,6 @@
 package KNU.YoriZori.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,6 +18,7 @@ import static jakarta.persistence.FetchType.LAZY;
 @Getter @Setter
 public class Fridge {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "fridge_id")
     private Long id;
 
@@ -24,6 +26,7 @@ public class Fridge {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "fridge", cascade = CascadeType.ALL)
     private List<PutIn> putIns = new ArrayList<>();
 
