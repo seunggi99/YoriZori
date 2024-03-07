@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -62,8 +63,22 @@ public class PutInServiceTest {
         PutIn result = putIns.get(0); // 테스트를 위해 추가된 첫 번째 재료를 가져옵니다.
         assertEquals(ingredient.getId(), result.getIngredient().getId()); // 재료 ID가 예상한 값과 일치하는지 확인
         assertEquals(putDate, result.getPutDate()); // 추가 날짜가 예상한 값과 일치하는지 확인
-        assertEquals((putDate.plusDays(ingredient.getDefaultExpDate())), result.getExpdate()); // 추가 날짜가 예상한 값과 일치하는지 확인
+        assertEquals((putDate.plusDays(ingredient.getDefaultExpDate())), result.getExpDate()); // 추가 날짜가 예상한 값과 일치하는지 확인
         assertEquals(storagePlace, result.getStoragePlace()); // 보관장소가 예상한 값과 일치하는지 확인
 
+    }
+
+    @Test
+    public void DdayTest(){
+        // Given: 테스트용 재료 생성
+        // Given
+        PutIn putIn = new PutIn();
+        putIn.setExpDate(LocalDateTime.now().plusDays(5)); // 소비 기한을 오늘로부터 5일 뒤로 설정
+
+        // When
+        putInService.UpdatePutIn(putIn);
+
+        // Then
+        assertEquals(5, putIn.getDDay()); // D-Day가 올바르게 계산되었는지 검증
     }
 }

@@ -25,5 +25,12 @@ public class PutInService {
 
         PutIn putIn = PutIn.createPutIn(fridge,ingredient, putDate, storagePlace);
         putInRepository.save(putIn);
+
+
+    }
+
+    public void UpdatePutIn(PutIn putIn) {
+        putIn.updateDday(); // D-Day 계산 및 업데이트
+        putInRepository.save(putIn); // 변경된 D-Day와 함께 PutIn 정보 저장
     }
 }

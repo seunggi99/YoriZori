@@ -7,7 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -31,8 +33,8 @@ public class PutIn {
     private Fridge fridge;
 
     private LocalDateTime putDate;
-    private LocalDateTime expdate;
-    private Long dday;
+    private LocalDateTime expDate;
+    private int dDay;
 
     @Enumerated(EnumType.STRING)
     private StoragePlace storagePlace;
@@ -44,8 +46,12 @@ public class PutIn {
         putIn.setIngredient(ingredient);
         putIn.setPutDate(putDate);
         putIn.setStoragePlace(storagePlace);
-        putIn.setExpdate(putDate.plusDays(ingredient.getDefaultExpDate()));
+        putIn.setExpDate(putDate.plusDays(ingredient.getDefaultExpDate()));
         return putIn;
+    }
+    public void updateDday() {
+        LocalDate now = LocalDate.now(); // 현재 날짜
+        this.dDay = (int) ChronoUnit.DAYS.between(now, this.expDate); // 소비 기한까지 남은 일수 계산
     }
 }
 
