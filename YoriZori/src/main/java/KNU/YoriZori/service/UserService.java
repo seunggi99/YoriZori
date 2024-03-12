@@ -4,6 +4,7 @@ import KNU.YoriZori.domain.Fridge;
 import KNU.YoriZori.domain.User;
 import KNU.YoriZori.repository.FridgeRepository;
 import KNU.YoriZori.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,7 @@ public class UserService {
     }
 
     public User findOne(Long userId) {
-        return userRepository.findOne(userId);
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found for id: " + userId));
     }
 }

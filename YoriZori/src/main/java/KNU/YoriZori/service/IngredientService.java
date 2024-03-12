@@ -2,6 +2,7 @@ package KNU.YoriZori.service;
 
 import KNU.YoriZori.domain.Ingredient;
 import KNU.YoriZori.repository.IngredientRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ public class IngredientService {
     }
 
     public Ingredient findOne(Long ingredientId){
-        return ingredientRepository.findOne(ingredientId);
+        return ingredientRepository.findById(ingredientId)
+                .orElseThrow(() -> new EntityNotFoundException("Ingredient not found for id: " + ingredientId));
     }
 }

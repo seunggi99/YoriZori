@@ -12,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.NoSuchElementException;
+
 import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
@@ -29,20 +31,16 @@ public class UserServiceTest {
     public void 회원가입() throws Exception {
         //given
         User user = new User();
-        user.setName("kim3");
+        user.setName("kim777");
         user.setNickname("소프트");
         user.setPassword("1234");
 
         //when
         Long savedId = userService.join(user);
-
-        Fridge fridge = new Fridge();
-
-        //fridgeService.join(fridge);
-
-        user.setFridge(fridge);
         //then
-        assertEquals(user, userRepository.findOne(savedId));
+        User foundUser = userRepository.findById(savedId)
+                .orElseThrow(() -> new NoSuchElementException("User not found with id: " + savedId));
+        assertEquals(user, foundUser);
     }
 
     @Test(expected = IllegalStateException.class)

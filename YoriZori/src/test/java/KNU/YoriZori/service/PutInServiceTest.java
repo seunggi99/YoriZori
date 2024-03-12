@@ -76,7 +76,7 @@ public class PutInServiceTest {
         putIn.setExpDate(LocalDateTime.now().plusDays(5)); // 소비 기한을 오늘로부터 5일 뒤로 설정
 
         // When
-        putInService.UpdatePutIn(putIn);
+        putInService.updatePutIn(putIn);
 
         // Then
         assertEquals(5, putIn.getDDay()); // D-Day가 올바르게 계산되었는지 검증
