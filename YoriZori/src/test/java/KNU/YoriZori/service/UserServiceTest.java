@@ -37,6 +37,7 @@ public class UserServiceTest {
 
         //when
         Long savedId = userService.join(user);
+
         //then
         User foundUser = userRepository.findById(savedId)
                 .orElseThrow(() -> new NoSuchElementException("User not found with id: " + savedId));

@@ -70,7 +70,7 @@ public class PutInServiceTest {
 
     @Test
     public void DdayTest(){
-        // Given: 테스트용 재료 생성
+
         // Given
         PutIn putIn = new PutIn();
         putIn.setExpDate(LocalDateTime.now().plusDays(5)); // 소비 기한을 오늘로부터 5일 뒤로 설정

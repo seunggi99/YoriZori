@@ -28,7 +28,7 @@ public class Recipe {
     private String imageUrl;
 
     @OneToMany(mappedBy = "recipe")
-    private List<RecipeIngredient> recipeIngredients = new ArrayList<>();
+    private List<RecipeIngredient> ingredients = new ArrayList<>();
 
     @ManyToOne(fetch = LAZY)
     private RecipeCategory category;

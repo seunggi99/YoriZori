@@ -1,12 +1,15 @@
 package KNU.YoriZori.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
+@Getter @Setter
 public class RecipeIngredient {
 
     @Id
