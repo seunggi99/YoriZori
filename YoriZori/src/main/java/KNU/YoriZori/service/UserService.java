@@ -36,4 +36,11 @@ public class UserService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found for id: " + userId));
     }
+
+    @Transactional
+    public void updateNickname(Long id, String nickname) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found for id: " + id));
+        user.setNickname(nickname);
+    }
 }
