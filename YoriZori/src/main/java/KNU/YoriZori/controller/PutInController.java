@@ -1,6 +1,7 @@
 package KNU.YoriZori.controller;
 
 import KNU.YoriZori.domain.PutIn;
+import KNU.YoriZori.domain.StoragePlace;
 import KNU.YoriZori.service.PutInService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -19,7 +21,7 @@ public class PutInController {
     // 냉장고에 재료 추가
     @PostMapping("/{fridgeId}/ingredients")
     public ResponseEntity<Void> addIngredientToFridge(@PathVariable Long fridgeId, @RequestBody PutInDTO putInDTO) {
-        putInService.addIngredientToFridge(putInDTO);
+        putInService.addIngredientToFridge(putInDTO.fridgeId, putInDTO.ingredientId, putInDTO.putDate, putInDTO.storagePlace);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -41,7 +43,7 @@ public class PutInController {
     static class PutInDTO {
         private Long fridgeId;
         private Long ingredientId;
-        private LocalDate putDate;
-        private String storagePlace;
+        private LocalDateTime putDate;
+        private StoragePlace storagePlace;
     }
 }

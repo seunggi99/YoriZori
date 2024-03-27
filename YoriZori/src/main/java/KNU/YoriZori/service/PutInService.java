@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,8 +31,22 @@ public class PutInService {
         updatePutIn(putIn);
     }
 
+    // 디데이 업데이트
     public void updatePutIn(PutIn putIn) {
         putIn.updateDday(); // D-Day 계산 및 업데이트
         putInRepository.save(putIn); // 변경된 D-Day와 함께 PutIn 정보 저장
+    }
+
+    // 냉장고에서 재료 제거
+    @Transactional
+    public void removeIngredientFromFridge(Long fridgeId, Long ingredientId) {
+        List<PutIn> putIns = putInRepository.findByFridgeIdAndIngredientId(fridgeId, ingredientId);
+        putIns.forEach(putIn -> putInRepository.delete(putIn));
+    }
+
+    // 냉장고의 재료 목록 조회
+    @Transactional
+    public List<PutIn> getIngredientsInFridge(Long fridgeId) {
+        return putInRepository.findAllByFridgeId(fridgeId);
     }
 }
