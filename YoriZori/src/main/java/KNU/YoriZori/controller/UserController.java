@@ -43,7 +43,7 @@ public class UserController {
         UserResponseDTO responseDTO = new UserResponseDTO();
 
         responseDTO.setId(user.getId());
-        responseDTO.setPassword(user.getPassword()); // 보안상 실제로는 비밀번호를 반환하지 않음
+        responseDTO.setPassword(user.getPassword()); // 보안상 변경 필요
         responseDTO.setNickname(user.getNickname());
 
         return ResponseEntity.ok(responseDTO);
