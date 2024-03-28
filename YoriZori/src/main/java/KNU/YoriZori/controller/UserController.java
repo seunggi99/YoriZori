@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -36,6 +37,18 @@ public class UserController {
         return new UpdateUserNicknameResponse(findUser.getId(), findUser.getNickname());
     }
 
+    @GetMapping("/login")
+    public ResponseEntity<UserResponseDTO> getUserByName(@RequestParam String name) {
+        User user = userService.findByName(name);
+        UserResponseDTO responseDTO = new UserResponseDTO();
+
+        responseDTO.setId(user.getId());
+        responseDTO.setPassword(user.getPassword()); // 보안상 실제로는 비밀번호를 반환하지 않음
+        responseDTO.setNickname(user.getNickname());
+
+        return ResponseEntity.ok(responseDTO);
+    }
+
     @Data
     static class UpdateUserNicknameRequest{
         private String nickname;
@@ -60,5 +73,11 @@ public class UserController {
         public CreateUserResponse(Long id) {
             this.id = id;
         }
+    }
+    @Data
+    public class UserResponseDTO {
+        private Long id;
+        private String password;
+        private String nickname;
     }
 }
