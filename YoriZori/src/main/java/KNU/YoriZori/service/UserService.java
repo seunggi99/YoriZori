@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -26,7 +27,7 @@ public class UserService {
     }
 
     private void validateDuplicateMember(User user) {
-        List<User> findMembers = userRepository.findByName(user.getName());
+        Optional<User> findMembers = userRepository.findByName(user.getName());
         if (!findMembers.isEmpty()) {
             throw new IllegalStateException("이미 존재하는 아이디입니다.");
         }
@@ -42,5 +43,10 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found for id: " + id));
         user.setNickname(nickname);
+    }
+
+    public User findByName(String name) {
+        return userRepository.findByName(name)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with name: " + name));
     }
 }
