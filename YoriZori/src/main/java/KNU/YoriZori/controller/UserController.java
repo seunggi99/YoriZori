@@ -24,7 +24,7 @@ public class UserController {
         user.setNickname(request.getNickname());
 
         Long id = userService.join(user);
-        return new CreateUserResponse(id);
+        return new CreateUserResponse(id); //test
     }
 
     // 회원 닉네임 변경
