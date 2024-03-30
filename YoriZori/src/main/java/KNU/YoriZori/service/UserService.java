@@ -2,6 +2,7 @@ package KNU.YoriZori.service;
 
 import KNU.YoriZori.domain.Fridge;
 import KNU.YoriZori.domain.User;
+import KNU.YoriZori.exception.UsernameAlreadyExistsException;
 import KNU.YoriZori.repository.FridgeRepository;
 import KNU.YoriZori.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -27,10 +28,10 @@ public class UserService {
     }
 
     private void validateDuplicateMember(User user) {
-        Optional<User> findMembers = userRepository.findByName(user.getName());
-        if (!findMembers.isEmpty()) {
-            throw new IllegalStateException("이미 존재하는 아이디입니다.");
-        }
+        userRepository.findByName(user.getName())
+                .ifPresent(u -> {
+                    throw new UsernameAlreadyExistsException("이미 존재하는 아이디입니다.");
+                });
     }
 
     public User findOne(Long userId) {
