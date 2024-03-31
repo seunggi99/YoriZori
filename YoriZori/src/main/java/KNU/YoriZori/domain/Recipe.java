@@ -33,5 +33,12 @@ public class Recipe {
     @ManyToOne(fetch = LAZY)
     private RecipeCategory category;
 
+    public List<RecipeIngredient> getRecipeIngredients() {
+        return ingredients;
+    }
+
+    public void setRecipeIngredients(List<RecipeIngredient> recipeIngredients) {
+        this.ingredients = recipeIngredients;
+    }
 }
 

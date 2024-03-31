@@ -19,4 +19,8 @@ public class AvoidIngredient {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ingredient_id")
     private Ingredient ingredient;
+
+    public Long getIngredientId() {
+        return ingredient.getId();
+    }
 }
