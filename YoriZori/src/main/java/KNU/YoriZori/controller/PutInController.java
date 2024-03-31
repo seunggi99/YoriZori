@@ -3,6 +3,7 @@ package KNU.YoriZori.controller;
 import KNU.YoriZori.domain.PutIn;
 import KNU.YoriZori.domain.StoragePlace;
 import KNU.YoriZori.service.PutInService;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,8 +36,16 @@ public class PutInController {
 
     // 냉장고의 재료 목록 조회
     @GetMapping("/{fridgeId}/ingredients")
-    public ResponseEntity<List<PutIn>> getIngredientsInFridge(@PathVariable Long fridgeId) {
-        List<PutIn> ingredients = putInService.getIngredientsInFridge(fridgeId);
+    public ResponseEntity<List<PutInResponseDto>> getIngredientsInFridge(@PathVariable Long fridgeId) {
+        List<PutInResponseDto> ingredients = putInService.getIngredientsInFridge(fridgeId).stream()
+                .map(putIn -> new PutInResponseDto(
+                        putIn.getId(),
+                        putIn.getDDay(),
+                        putIn.getExpDate(),
+                        putIn.getPutDate(),
+                        putIn.getStoragePlace(),
+                        putIn.getIngredient().getId()))
+                .collect(Collectors.toList());
         return ResponseEntity.ok(ingredients);
     }
 
@@ -46,4 +56,16 @@ public class PutInController {
         private LocalDate putDate;
         private StoragePlace storagePlace;
     }
+
+    @Data
+    @AllArgsConstructor
+    private static class PutInResponseDto {
+        private Long id;
+        private int dDay;
+        public LocalDate expDate;
+        public LocalDate putDate;
+        private StoragePlace storagePlace;
+        private Long ingredientId;
+    }
+
 }

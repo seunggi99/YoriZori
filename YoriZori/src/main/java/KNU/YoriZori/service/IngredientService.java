@@ -24,4 +24,7 @@ public class IngredientService {
         return ingredientRepository.findById(ingredientId)
                 .orElseThrow(() -> new EntityNotFoundException("Ingredient not found for id: " + ingredientId));
     }
+    public List<Ingredient> getAllIngredients() {
+        return ingredientRepository.findAll();
+    }
 }

@@ -1,6 +1,7 @@
 package KNU.YoriZori.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,11 +21,13 @@ public class Ingredient {
 
     private String name;
     private int defaultExpDate;
+    private String imageUrl;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "ingredient_category_id")
     private IngredientCategory category;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "ingredient")
     private List<RecipeIngredient> recipeIngredients = new ArrayList<>();
 }
