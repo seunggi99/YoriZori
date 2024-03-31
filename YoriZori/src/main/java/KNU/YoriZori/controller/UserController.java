@@ -3,9 +3,7 @@ package KNU.YoriZori.controller;
 import KNU.YoriZori.domain.User;
 import KNU.YoriZori.service.UserService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,18 +35,33 @@ public class UserController {
         return new UpdateUserNicknameResponse(findUser.getId(), findUser.getNickname());
     }
 
-    @GetMapping("/login")
-    public ResponseEntity<UserResponseDTO> getUserByName(@RequestParam String name) {
-        User user = userService.findByName(name);
-        UserResponseDTO responseDTO = new UserResponseDTO();
 
-        responseDTO.setId(user.getId());
-        responseDTO.setPassword(user.getPassword()); // 보안상 변경 필요
-        responseDTO.setNickname(user.getNickname());
-
-        return ResponseEntity.ok(responseDTO);
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse> login(@RequestBody LoginRequest loginRequest) {
+        return userService.authenticate(loginRequest.getName(), loginRequest.getPassword())
+                .map(user -> ResponseEntity.ok(new ApiResponse(true, user.getId(), user.getNickname())))
+                .orElse(ResponseEntity.ok(new ApiResponse(false, "아이디 혹은 비밀번호를 확인해주십시오.")));
     }
 
+    @Data
+    public class ApiResponse {
+        private boolean success;
+        private String message;
+        private Long userId;
+        private String nickname;
+
+        public ApiResponse(boolean success, String message) {
+            this.success = success;
+            this.message = message;
+        }
+
+        public ApiResponse(boolean success, Long userId, String nickname) {
+            this.success = success;
+            this.userId = userId;
+            this.nickname = nickname;
+        }
+
+    }
     @Data
     static class UpdateUserNicknameRequest{
         private String nickname;
@@ -80,4 +93,19 @@ public class UserController {
         private String password;
         private String nickname;
     }
+
+    @Data
+    @NoArgsConstructor
+    public static class LoginRequest {
+        private String name;
+        private String password;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public class LoginResponse {
+        private Long id;
+        private String nickname;
+    }
+
 }
