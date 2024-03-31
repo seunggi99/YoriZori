@@ -8,10 +8,12 @@ import KNU.YoriZori.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -49,5 +51,16 @@ public class PutInService {
     @Transactional
     public List<PutIn> getIngredientsInFridge(Long fridgeId) {
         return putInRepository.findAllByFridgeId(fridgeId);
+    }
+
+    @Async
+    public void updateAllDdays() {
+        List<PutIn> allPutIns = putInRepository.findAll();
+        LocalDate today = LocalDate.now();
+        allPutIns.forEach(putIn -> {
+            long dDay = ChronoUnit.DAYS.between(today, putIn.getExpDate());
+            putIn.setDDay((int)dDay);
+        });
+        putInRepository.saveAll(allPutIns);
     }
 }

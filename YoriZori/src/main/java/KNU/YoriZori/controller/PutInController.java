@@ -37,6 +37,7 @@ public class PutInController {
     // 냉장고의 재료 목록 조회
     @GetMapping("/{fridgeId}/ingredients")
     public ResponseEntity<List<PutInResponseDto>> getIngredientsInFridge(@PathVariable Long fridgeId) {
+        putInService.updateAllDdays(); //디데이 업데이트
         List<PutInResponseDto> ingredients = putInService.getIngredientsInFridge(fridgeId).stream()
                 .map(putIn -> new PutInResponseDto(
                         putIn.getId(),
