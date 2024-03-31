@@ -43,7 +43,7 @@ public class PutInController {
     static class PutInDTO {
         private Long fridgeId;
         private Long ingredientId;
-        private LocalDateTime putDate;
+        private LocalDate putDate;
         private StoragePlace storagePlace;
     }
 }

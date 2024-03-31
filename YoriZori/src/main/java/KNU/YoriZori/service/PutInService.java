@@ -10,6 +10,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class PutInService {
     private final FridgeRepository fridgeRepository;
 
     @Transactional
-    public void addIngredientToFridge(Long fridgeId, Long ingredientId, LocalDateTime putDate, StoragePlace storagePlace) {
+    public void addIngredientToFridge(Long fridgeId, Long ingredientId, LocalDate putDate, StoragePlace storagePlace) {
         Fridge fridge = fridgeRepository.findById(fridgeId)
                 .orElseThrow(() -> new EntityNotFoundException("Fridge not found for id: " + fridgeId));
         Ingredient ingredient = ingredientRepository.findById(ingredientId)

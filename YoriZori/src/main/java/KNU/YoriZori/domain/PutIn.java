@@ -32,15 +32,15 @@ public class PutIn {
     @JoinColumn(name = "fridge_id")
     private Fridge fridge;
 
-    private LocalDateTime putDate;
-    private LocalDateTime expDate;
+    private LocalDate putDate;
+    private LocalDate expDate;
     private int dDay;
 
     @Enumerated(EnumType.STRING)
     private StoragePlace storagePlace;
 
 
-    public static PutIn createPutIn(Fridge fridge, Ingredient ingredient, LocalDateTime putDate, StoragePlace storagePlace){
+    public static PutIn createPutIn(Fridge fridge, Ingredient ingredient, LocalDate putDate, StoragePlace storagePlace){
         PutIn putIn = new PutIn();
         putIn.setFridge(fridge);
         putIn.setIngredient(ingredient);

@@ -50,7 +50,7 @@ public class PutInServiceTest {
         ingredient.setDefaultExpDate(7); // 7일 소비기한 설정
         ingredientService.saveIngredient(ingredient);
 
-        LocalDateTime putDate = LocalDateTime.now();
+        LocalDate putDate = LocalDate.now();
         StoragePlace storagePlace = StoragePlace.COLD;
         Fridge fridge = user.getFridge();
 
@@ -73,7 +73,7 @@ public class PutInServiceTest {
 
         // Given
         PutIn putIn = new PutIn();
-        putIn.setExpDate(LocalDateTime.now().plusDays(5)); // 소비 기한을 오늘로부터 5일 뒤로 설정
+        putIn.setExpDate(LocalDate.now().plusDays(5)); // 소비 기한을 오늘로부터 5일 뒤로 설정
 
         // When
         putInService.updatePutIn(putIn);

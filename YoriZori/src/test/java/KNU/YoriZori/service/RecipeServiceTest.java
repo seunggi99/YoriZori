@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -92,7 +93,7 @@ class RecipeServiceTest {
         recipeIngredientRepository.save(recipeIngredient3);
 
         // 냉장고에 재료 추가
-        putInService.addIngredientToFridge(fridge.getId(), ingredient.getId(), LocalDateTime.now(), StoragePlace.COLD);
+        putInService.addIngredientToFridge(fridge.getId(), ingredient.getId(), LocalDate.now(), StoragePlace.COLD);
 
         // 부족한 재료
         List<Ingredient> insufficientIngredients = recipeService.findInsufficientIngredient(recipe.getId(), fridge.getId());
