@@ -1,6 +1,7 @@
 package KNU.YoriZori.service;
 
 import KNU.YoriZori.domain.*;
+import KNU.YoriZori.dto.UpdatePutInRequestDto;
 import KNU.YoriZori.repository.FridgeRepository;
 import KNU.YoriZori.repository.IngredientRepository;
 import KNU.YoriZori.repository.PutInRepository;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -40,11 +42,24 @@ public class PutInService {
         putInRepository.save(putIn); // 변경된 D-Day와 함께 PutIn 정보 저장
     }
 
+    // 냉장고 속 재료 업데이트
+    @Transactional
+    public void updatePutInFromFridge(Long putInId, UpdatePutInRequestDto dto) {
+
+        PutIn putIn = putInRepository.findById(putInId)
+                .orElseThrow(() -> new EntityNotFoundException("PutIn not found with id: " + putInId));
+
+        putIn.setExpDate(dto.getExpDate());
+        putIn.setPutDate(dto.getPutDate());
+        putIn.setStoragePlace(dto.getStoragePlace());
+
+    }
+
     // 냉장고에서 재료 제거
     @Transactional
-    public void removeIngredientFromFridge(Long fridgeId, Long ingredientId) {
-        List<PutIn> putIns = putInRepository.findByFridgeIdAndIngredientId(fridgeId, ingredientId);
-        putIns.forEach(putIn -> putInRepository.delete(putIn));
+    public void removeIngredientFromFridge(Long putInId) {
+        Optional<PutIn> putInOptional = putInRepository.findById(putInId);
+        putInOptional.ifPresent(putIn -> putInRepository.delete(putIn));
     }
 
     // 냉장고의 재료 목록 조회

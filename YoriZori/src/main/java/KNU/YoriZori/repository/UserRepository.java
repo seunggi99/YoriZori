@@ -1,6 +1,7 @@
 package KNU.YoriZori.repository;
 
 import KNU.YoriZori.domain.Recipe;
+import KNU.YoriZori.domain.RecipeIngredient;
 import KNU.YoriZori.domain.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

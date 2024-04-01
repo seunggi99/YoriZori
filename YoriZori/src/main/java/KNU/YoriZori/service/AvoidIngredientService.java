@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +40,23 @@ public class AvoidIngredientService {
     @Transactional
     public void removeAvoidIngredient(Long avoidIngredientId) {
         avoidIngredientRepository.deleteById(avoidIngredientId);
+    }
+
+    public Long findAvoidIngredientIdByUserIdAndIngredientId(Long userId, Long ingredientId) {
+        Optional<AvoidIngredient> avoidIngredientOptional = avoidIngredientRepository.findByUser_IdAndIngredient_Id(userId, ingredientId);
+
+        return avoidIngredientOptional.map(AvoidIngredient::getId)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Avoid ingredient not found for user: " + userId + " and ingredient: " + ingredientId));
+    }
+
+    public AvoidIngredient findOne(Long avoidIngredientId) {
+        return avoidIngredientRepository.findById(avoidIngredientId)
+                .orElseThrow(() -> new EntityNotFoundException("AvoidIngredient not found for id: " + avoidIngredientId));
+    }
+
+    public List<AvoidIngredient> getAvoidIngredientsByUserId(Long userId) {
+        return avoidIngredientRepository.findByUserId(userId);
     }
 
 }

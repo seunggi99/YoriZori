@@ -51,6 +51,7 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User not found with name: " + name));
     }
 
+
     public Optional<User> authenticate(String name, String password) {
         return userRepository.findByNameAndPassword(name, password);
     }

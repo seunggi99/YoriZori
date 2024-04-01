@@ -1,14 +1,17 @@
 package KNU.YoriZori.service;
 
+import KNU.YoriZori.controller.RecipeController;
 import KNU.YoriZori.domain.*;
 import KNU.YoriZori.repository.AvoidIngredientRepository;
 import KNU.YoriZori.repository.PutInRepository;
 import KNU.YoriZori.repository.RecipeIngredientRepository;
 import KNU.YoriZori.repository.RecipeRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,6 +23,11 @@ public class RecipeService {
     private final PutInRepository putInRepository;
     private final RecipeIngredientRepository recipeIngredientRepository;
     private final AvoidIngredientRepository avoidIngredientRepository;
+    public Recipe findOne(Long recipeId) {
+        return recipeRepository.findById(recipeId)
+                .orElseThrow(() -> new EntityNotFoundException("Recipe not found for id: " + recipeId));
+    }
+
     // 부족한 재료 반환
     public List<Ingredient> findInsufficientIngredient(Long recipeId, Long fridgeId) {
         // 레시피에 필요한 재료 목록 조회
@@ -57,21 +65,39 @@ public class RecipeService {
 
     // 회원 ID를 기반으로 기피 재료가 포함되지 않은 레시피 조회
     @Transactional
-    public List<Recipe> findRecipesExcludingAvoidIngredients(Long userId) {
-        // 사용자가 기피하는 재료 목록을 조회
-        List<Long> avoidIngredientIds = avoidIngredientRepository.findByUserId(userId)
-                .stream()
-                .map(avoidIngredient -> avoidIngredient.getIngredient().getId())
+    public List<RecipeController.RecipeDetailsDto> findRecipesDetailsExcludingAvoidIngredients(Long userId, Long fridgeId) {
+        // 사용자의 기피 재료 ID 목록을 조회
+        List<Long> avoidIngredientIds = avoidIngredientRepository.findByUserId(userId).stream()
+                .map(avoidIngredient -> avoidIngredient.getIngredient().getId()) // 올바른 접근 방식
                 .collect(Collectors.toList());
 
-        // 기피 재료를 포함하지 않는 레시피 목록 조회 로직 구현
-        List<Long> avoidRecipeIds = recipeRepository.findRecipesWithIngredients(avoidIngredientIds)
+        // 기피 재료를 제외한 모든 레시피 조회
+        List<Recipe> filteredRecipes = recipeRepository.findAll()
                 .stream()
-                .map(Recipe::getId)
-                .distinct()
+                .filter(recipe -> recipe.getRecipeIngredients().stream() // Recipe 엔터티에서 메서드 호출
+                        .noneMatch(ri -> avoidIngredientIds.contains(ri.getIngredient().getId())))
                 .collect(Collectors.toList());
 
-        return recipeRepository.findByIdNotIn(avoidRecipeIds);
+        List<RecipeController.RecipeDetailsDto> recipeDetailsDtos = new ArrayList<>();
+
+        for (Recipe recipe : filteredRecipes) {
+            List<Ingredient> insufficientIngredients = findInsufficientIngredient(recipe.getId(), fridgeId);
+            List<Long> insufficientIngredientNames = insufficientIngredients.stream()
+                    .map(Ingredient::getId)
+                    .collect(Collectors.toList());
+
+            RecipeController.RecipeDetailsDto recipeDetailsDto = new RecipeController.RecipeDetailsDto(
+                    recipe.getId(),
+                    recipe.getName(),
+                    recipe.getIntroduction(),
+                    recipe.getCookingInstructions(),
+                    recipe.getImageUrl(),
+                    insufficientIngredients.size(),
+                    insufficientIngredientNames);
+
+            recipeDetailsDtos.add(recipeDetailsDto);
+        }
+        return recipeDetailsDtos;
     }
 
 }

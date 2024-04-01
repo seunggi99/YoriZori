@@ -2,6 +2,7 @@ package KNU.YoriZori.controller;
 
 import KNU.YoriZori.domain.PutIn;
 import KNU.YoriZori.domain.StoragePlace;
+import KNU.YoriZori.dto.UpdatePutInRequestDto;
 import KNU.YoriZori.service.PutInService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/fridges")
 public class PutInController {
     private final PutInService putInService;
 
@@ -28,15 +30,29 @@ public class PutInController {
     }
 
     // 냉장고에서 재료 제거
-    @DeleteMapping("/{fridgeId}/ingredients/{ingredientId}")
-    public ResponseEntity<Void> removeIngredientFromFridge(@PathVariable Long fridgeId, @PathVariable Long ingredientId) {
-        putInService.removeIngredientFromFridge(fridgeId, ingredientId);
+    @DeleteMapping("/{fridgeId}/ingredients/{putInId}")
+    public ResponseEntity<Void> removeIngredientFromFridge(
+            @PathVariable Long fridgeId,
+            @PathVariable Long putInId) {
+
+        putInService.removeIngredientFromFridge(putInId);
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{fridgeId}/ingredients/{putInId}")
+    public ResponseEntity<List<PutInResponseDto>> updateIngredientFromFridge(
+            @PathVariable Long fridgeId,
+            @PathVariable Long putInId,
+            @RequestBody UpdatePutInRequestDto putInDTO){
+        putInService.updatePutInFromFridge(putInId, putInDTO);
+        return ResponseEntity.ok().build();
+
     }
 
     // 냉장고의 재료 목록 조회
     @GetMapping("/{fridgeId}/ingredients")
-    public ResponseEntity<List<PutInResponseDto>> getIngredientsInFridge(@PathVariable Long fridgeId) {
+    public ResponseEntity<List<PutInResponseDto>> getIngredientsInFridge(
+            @PathVariable Long fridgeId) {
         putInService.updateAllDdays(); //디데이 업데이트
         List<PutInResponseDto> ingredients = putInService.getIngredientsInFridge(fridgeId).stream()
                 .map(putIn -> new PutInResponseDto(
@@ -45,7 +61,10 @@ public class PutInController {
                         putIn.getExpDate(),
                         putIn.getPutDate(),
                         putIn.getStoragePlace(),
-                        putIn.getIngredient().getId()))
+                        putIn.getIngredient().getId(),
+                        putIn.getIngredient().getImageUrl(),
+                        putIn.getIngredient().getCategory().getId()
+                ))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(ingredients);
     }
@@ -67,6 +86,8 @@ public class PutInController {
         public LocalDate putDate;
         private StoragePlace storagePlace;
         private Long ingredientId;
+        private String imageUrl;
+        private Long categoryId;
     }
 
 }

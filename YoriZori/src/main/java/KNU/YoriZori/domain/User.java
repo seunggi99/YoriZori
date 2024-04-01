@@ -24,5 +24,6 @@ public class User {
     @OneToOne(fetch = LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "fridge_id")
     private Fridge fridge;
+
 }
 

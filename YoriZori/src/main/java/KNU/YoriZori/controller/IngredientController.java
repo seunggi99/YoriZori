@@ -24,10 +24,12 @@ public class IngredientController {
                         ingredient.getId(),
                         ingredient.getName(),
                         ingredient.getDefaultExpDate(),
-                        ingredient.getImageUrl()))
+                        ingredient.getImageUrl(),
+                        ingredient.getCategoryId()))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(ingredients);
     }
+
 
     @Data
     @AllArgsConstructor
@@ -36,5 +38,6 @@ public class IngredientController {
         private String name;
         private int defaultExpDate;
         private String imageUrl;
+        private Long categoryId;
     }
 }

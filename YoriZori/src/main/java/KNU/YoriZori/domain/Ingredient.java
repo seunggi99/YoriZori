@@ -30,5 +30,9 @@ public class Ingredient {
     @JsonIgnore
     @OneToMany(mappedBy = "ingredient")
     private List<RecipeIngredient> recipeIngredients = new ArrayList<>();
+
+    public Long getCategoryId() {
+        return category.getId();
+    }
 }
 
