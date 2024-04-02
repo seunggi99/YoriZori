@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,6 +67,7 @@ public class PutInController {
                         putIn.getIngredient().getCategory().getId(),
                         putIn.getIngredient().getName()
                 ))
+                .sorted(Comparator.comparingInt(PutInResponseDto::getDDay)) // 디데이 기준으로 오름차순 정렬
                 .collect(Collectors.toList());
         return ResponseEntity.ok(ingredients);
     }
