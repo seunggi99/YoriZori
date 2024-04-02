@@ -25,7 +25,7 @@ public class PutInController {
     // 냉장고에 재료 추가
     @PostMapping("/{fridgeId}/ingredients")
     public ResponseEntity<Void> addIngredientToFridge(@PathVariable Long fridgeId, @RequestBody PutInDTO putInDTO) {
-        putInService.addIngredientToFridge(putInDTO.fridgeId, putInDTO.ingredientId, putInDTO.putDate, putInDTO.storagePlace);
+        putInService.addIngredientToFridge(putInDTO.fridgeId, putInDTO.ingredientId, putInDTO.putDate, putInDTO.expDate, putInDTO.storagePlace);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -75,6 +75,7 @@ public class PutInController {
         private Long fridgeId;
         private Long ingredientId;
         private LocalDate putDate;
+        private LocalDate expDate;
         private StoragePlace storagePlace;
     }
 

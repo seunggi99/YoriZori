@@ -26,13 +26,13 @@ public class PutInService {
     private final FridgeRepository fridgeRepository;
 
     @Transactional
-    public void addIngredientToFridge(Long fridgeId, Long ingredientId, LocalDate putDate, StoragePlace storagePlace) {
+    public void addIngredientToFridge(Long fridgeId, Long ingredientId, LocalDate putDate,LocalDate expDate, StoragePlace storagePlace) {
         Fridge fridge = fridgeRepository.findById(fridgeId)
                 .orElseThrow(() -> new EntityNotFoundException("Fridge not found for id: " + fridgeId));
         Ingredient ingredient = ingredientRepository.findById(ingredientId)
                 .orElseThrow(() -> new EntityNotFoundException("Ingredient not found for id: " + ingredientId));
 
-        PutIn putIn = PutIn.createPutIn(fridge,ingredient, putDate, storagePlace);
+        PutIn putIn = PutIn.createPutIn(fridge,ingredient, putDate, expDate, storagePlace);
         updatePutIn(putIn);
     }
 

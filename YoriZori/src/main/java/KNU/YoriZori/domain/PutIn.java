@@ -40,13 +40,13 @@ public class PutIn {
     private StoragePlace storagePlace;
 
 
-    public static PutIn createPutIn(Fridge fridge, Ingredient ingredient, LocalDate putDate, StoragePlace storagePlace){
+    public static PutIn createPutIn(Fridge fridge, Ingredient ingredient, LocalDate putDate, LocalDate expDate, StoragePlace storagePlace){
         PutIn putIn = new PutIn();
         putIn.setFridge(fridge);
         putIn.setIngredient(ingredient);
         putIn.setPutDate(putDate);
         putIn.setStoragePlace(storagePlace);
-        putIn.setExpDate(putDate.plusDays(ingredient.getDefaultExpDate()));
+        putIn.setExpDate(expDate);
         return putIn;
     }
     public void updateDday() {
