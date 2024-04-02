@@ -51,11 +51,12 @@ public class PutInServiceTest {
         ingredientService.saveIngredient(ingredient);
 
         LocalDate putDate = LocalDate.now();
+        LocalDate expDate = LocalDate.now();
         StoragePlace storagePlace = StoragePlace.COLD;
         Fridge fridge = user.getFridge();
 
         // When
-        putInService.addIngredientToFridge(fridge.getId(), ingredient.getId(), putDate, storagePlace);
+        putInService.addIngredientToFridge(fridge.getId(), ingredient.getId(), putDate, expDate, storagePlace);
 
         // Then
         List<PutIn> putIns = putInRepository.findAllByFridgeId(fridge.getId());
