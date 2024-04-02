@@ -93,7 +93,7 @@ class RecipeServiceTest {
         recipeIngredientRepository.save(recipeIngredient3);
 
         // 냉장고에 재료 추가
-        putInService.addIngredientToFridge(fridge.getId(), ingredient.getId(), LocalDate.now(), StoragePlace.COLD);
+        putInService.addIngredientToFridge(fridge.getId(), ingredient.getId(), LocalDate.now(), LocalDate.now(),StoragePlace.COLD);
 
         // 부족한 재료
         List<Ingredient> insufficientIngredients = recipeService.findInsufficientIngredient(recipe.getId(), fridge.getId());
@@ -116,4 +116,6 @@ class RecipeServiceTest {
         // 부족한 재료 리스트 비교
         assertTrue(actualInsufficientIngredientIds.containsAll(expectedInsufficientIngredientIds), "부족한 재료 목록이 예상과 다릅니다.");
     }
+
+
 }
