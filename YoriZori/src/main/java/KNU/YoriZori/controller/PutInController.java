@@ -63,7 +63,8 @@ public class PutInController {
                         putIn.getStoragePlace(),
                         putIn.getIngredient().getId(),
                         putIn.getIngredient().getImageUrl(),
-                        putIn.getIngredient().getCategory().getId()
+                        putIn.getIngredient().getCategory().getId(),
+                        putIn.getIngredient().getName()
                 ))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(ingredients);
@@ -88,6 +89,7 @@ public class PutInController {
         private Long ingredientId;
         private String imageUrl;
         private Long categoryId;
+        private String name;
     }
 
 }
