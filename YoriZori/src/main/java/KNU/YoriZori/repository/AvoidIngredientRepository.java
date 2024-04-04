@@ -1,7 +1,6 @@
 package KNU.YoriZori.repository;
 
 import KNU.YoriZori.domain.AvoidIngredient;
-import KNU.YoriZori.domain.Ingredient;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

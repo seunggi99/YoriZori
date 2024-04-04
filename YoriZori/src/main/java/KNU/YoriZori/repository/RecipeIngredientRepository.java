@@ -1,6 +1,5 @@
 package KNU.YoriZori.repository;
 
-import KNU.YoriZori.domain.PutIn;
 import KNU.YoriZori.domain.RecipeIngredient;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

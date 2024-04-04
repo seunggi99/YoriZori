@@ -5,7 +5,6 @@ import KNU.YoriZori.dto.UpdatePutInRequestDto;
 import KNU.YoriZori.repository.FridgeRepository;
 import KNU.YoriZori.repository.IngredientRepository;
 import KNU.YoriZori.repository.PutInRepository;
-import KNU.YoriZori.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +12,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;

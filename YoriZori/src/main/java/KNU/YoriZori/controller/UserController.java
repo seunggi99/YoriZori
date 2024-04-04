@@ -1,6 +1,6 @@
 package KNU.YoriZori.controller;
 
-import KNU.YoriZori.domain.AvoidIngredient;
+
 import KNU.YoriZori.domain.User;
 import KNU.YoriZori.service.AvoidIngredientService;
 import KNU.YoriZori.service.UserService;
@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController

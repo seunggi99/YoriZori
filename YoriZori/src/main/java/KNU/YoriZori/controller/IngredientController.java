@@ -1,6 +1,5 @@
 package KNU.YoriZori.controller;
 
-import KNU.YoriZori.domain.Ingredient;
 import KNU.YoriZori.service.IngredientService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
