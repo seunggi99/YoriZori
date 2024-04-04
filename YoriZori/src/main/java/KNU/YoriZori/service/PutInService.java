@@ -38,8 +38,14 @@ public class PutInService {
 
     // 디데이 업데이트
     public void updatePutIn(PutIn putIn) {
-        putIn.updateDday(); // D-Day 계산 및 업데이트
-        putInRepository.save(putIn); // 변경된 D-Day와 함께 PutIn 정보 저장
+        if (putIn.getExpDate() != null) {
+            putIn.updateDday(); // D-Day 계산 및 업데이트
+            putInRepository.save(putIn); // 변경된 D-Day와 함께 PutIn 정보 저장
+        }
+        else {
+            putIn.setDDay(990808);
+            putInRepository.save(putIn);
+        }
     }
 
     // 냉장고 속 재료 업데이트
