@@ -1,6 +1,7 @@
 package KNU.YoriZori.controller;
 
 import KNU.YoriZori.domain.Recipe;
+import KNU.YoriZori.dto.UserFilteredRecipeDetailsDto;
 import KNU.YoriZori.dto.UserFilteredRecipeDto;
 import KNU.YoriZori.service.AvoidIngredientService;
 import KNU.YoriZori.service.FridgeService;
@@ -63,10 +64,10 @@ public class RecipeController {
 
     // 회원 레시피 상세 페이지
     @GetMapping("/recipes/{fridgeId}/{recipeId}")
-    public ResponseEntity<List<RecipeResponseDto>> getRecipesDetail(@PathVariable Long fridgeId, @PathVariable Long recipeId){
+    public ResponseEntity<List<UserFilteredRecipeDetailsDto>> getUserFilteredRecipesDetail(@PathVariable Long fridgeId, @PathVariable Long recipeId){
+       List<UserFilteredRecipeDetailsDto> recipes = recipeService.findUserFilteredRecipeDetails(fridgeId,recipeId);
 
-
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(recipes);
     }
 
 

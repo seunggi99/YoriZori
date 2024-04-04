@@ -2,6 +2,7 @@ package KNU.YoriZori.service;
 
 import KNU.YoriZori.controller.RecipeController;
 import KNU.YoriZori.domain.*;
+import KNU.YoriZori.dto.UserFilteredRecipeDetailsDto;
 import KNU.YoriZori.dto.UserFilteredRecipeDto;
 import KNU.YoriZori.repository.*;
 import jakarta.persistence.EntityNotFoundException;
@@ -112,6 +113,7 @@ public class RecipeService {
             filteredRecipes.add(new UserFilteredRecipeDto(
                     recipe.getId(),
                     recipe.getName(),
+                    recipe.getImageUrl(),
                     insufficientIngredients.size(), // 부족한 재료의 개수
                     insufficientIngredientIds       // 부족한 재료 ID 목록
             ));
@@ -120,4 +122,32 @@ public class RecipeService {
         return filteredRecipes;
     }
 
+    @Transactional
+    public List<UserFilteredRecipeDetailsDto> findUserFilteredRecipeDetails(Long fridgeId, Long recipeId) {
+
+        Long userId = userRepository.findByFridgeId(fridgeId).getId();
+        Recipe recipe = findOne(recipeId);
+        // 결과 DTO 리스트 생성
+        List<UserFilteredRecipeDetailsDto> filteredRecipes = new ArrayList<>();
+
+        // 각 레시피에 대한 부족한 재료 목록 조회
+        List<Ingredient> insufficientIngredients = findInsufficientIngredient(recipeId, fridgeId);
+
+        // 부족한 재료의 ID 목록 생성
+        List<Long> insufficientIngredientIds = insufficientIngredients.stream()
+                    .map(Ingredient::getId)
+                    .collect(Collectors.toList());
+
+        // UserFilteredRecipeDto 객체 생성 및 추가
+        filteredRecipes.add(new UserFilteredRecipeDetailsDto(
+                recipe.getId(),
+                recipe.getName(),
+                recipe.getIntroduction(),
+                recipe.getCookingInstructions(),
+                recipe.getImageUrl(),
+                insufficientIngredients.size(), // 부족한 재료의 개수
+                insufficientIngredientIds       // 부족한 재료 ID 목록
+        ));
+        return filteredRecipes;
+    }
 }
