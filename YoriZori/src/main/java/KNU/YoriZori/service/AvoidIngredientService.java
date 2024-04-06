@@ -27,7 +27,7 @@ public class AvoidIngredientService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id " + userId));
         Ingredient ingredient = ingredientRepository.findById(ingredientId)
-                .orElseThrow(() -> new EntityNotFoundException("Recipe not found with id " + ingredientId));
+                .orElseThrow(() -> new EntityNotFoundException("Ingredient not found with id " + ingredientId));
 
         avoidIngredient.setUser(user);
         avoidIngredient.setIngredient(ingredient);

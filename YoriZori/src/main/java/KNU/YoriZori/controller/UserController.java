@@ -69,9 +69,11 @@ public class UserController {
 
     }
 
-    @PostMapping("users/{userId}/avoid-ingredients/{ingredientId}")
-    public ResponseEntity<?> addAvoidIngredientToUser(@PathVariable Long userId, @PathVariable Long ingredientId) {
-        avoidIngredientService.addAvoidIngredient(userId, ingredientId);
+    @PostMapping("users/{userId}/avoid-ingredients")
+    public ResponseEntity<?> addAvoidIngredientToUser(@PathVariable Long userId, @RequestBody List<Long> ingredientIds) {
+        for (Long ingredientId : ingredientIds) {
+            avoidIngredientService.addAvoidIngredient(userId, ingredientId);
+        }
         return ResponseEntity.ok().build();
     }
 
