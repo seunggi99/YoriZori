@@ -31,14 +31,8 @@ public class Recipe {
     private List<RecipeIngredient> ingredients = new ArrayList<>();
 
     @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "recipe_category_id")
     private RecipeCategory category;
 
-    public List<RecipeIngredient> getRecipeIngredients() {
-        return ingredients;
-    }
-
-    public void setRecipeIngredients(List<RecipeIngredient> recipeIngredients) {
-        this.ingredients = recipeIngredients;
-    }
 }
 

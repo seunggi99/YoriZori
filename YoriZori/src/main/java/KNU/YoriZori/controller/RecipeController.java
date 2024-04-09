@@ -28,7 +28,10 @@ public class RecipeController {
                 .map(recipe -> new RecipeDto(
                         recipe.getId(),
                         recipe.getName(),
-                        recipe.getImageUrl()))
+                        recipe.getImageUrl(),
+                        recipe.getCategory().getId(),
+                        recipe.getCategory().getName()
+                ))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(recipes);
     }
@@ -53,7 +56,9 @@ public class RecipeController {
                 recipe.getName(),
                 recipe.getIntroduction(),
                 recipe.getCookingInstructions(),
-                recipe.getImageUrl()
+                recipe.getImageUrl(),
+                recipe.getCategory().getId(),
+                recipe.getCategory().getName()
         );
         return ResponseEntity.ok(responseDto);
     }
@@ -75,6 +80,8 @@ public class RecipeController {
         private String introduction;
         private String cookingInstructions;
         private String imageUrl;
+        private Long categoryId;
+        private String categoryName;
     }
 
     @Data
@@ -83,6 +90,8 @@ public class RecipeController {
         private Long id;
         private String name;
         private String imageUrl;
+        private Long categoryId;
+        private String categoryName;
     }
     @Data
     @AllArgsConstructor

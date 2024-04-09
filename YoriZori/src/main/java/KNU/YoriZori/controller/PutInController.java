@@ -62,7 +62,8 @@ public class PutInController {
                         putIn.getStoragePlace(),
                         putIn.getIngredient().getId(),
                         putIn.getIngredient().getImageUrl(),
-                        putIn.getIngredient().getCategory().getId(),
+                        putIn.getIngredient().getCategoryId(),
+                        putIn.getIngredient().getCategory().getName(),
                         putIn.getIngredient().getName()
                 ))
                 .sorted(Comparator.comparingInt(PutInResponseDto::getDDay)) // 디데이 기준으로 오름차순 정렬
@@ -90,6 +91,7 @@ public class PutInController {
         private Long ingredientId;
         private String imageUrl;
         private Long categoryId;
+        private String categoryName;
         private String name;
     }
 
