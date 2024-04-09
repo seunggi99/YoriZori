@@ -94,8 +94,8 @@ public class UserController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(avoidIngredients);
     }
-    @DeleteMapping("users/avoid-ingredients")
-    public ResponseEntity<?> removeAvoidIngredientFromUser(@RequestBody Long avoidIngredientId) {
+    @DeleteMapping("users/avoid-ingredients/{avoidIngredientId}")
+    public ResponseEntity<?> removeAvoidIngredientFromUser(@PathVariable Long avoidIngredientId) {
         if (avoidIngredientId != null && avoidIngredientId != 0) {
             avoidIngredientService.removeAvoidIngredient(avoidIngredientId);
             return ResponseEntity.ok().build();
@@ -125,8 +125,8 @@ public class UserController {
         return ResponseEntity.ok(bookmarks);
     }
 
-    @DeleteMapping("users/bookmarks")
-    public ResponseEntity<?> deleteRecipeBookmark(@RequestBody Long recipeBookmarkId){
+    @DeleteMapping("users/bookmarks/{recipeBookmarkId}")
+    public ResponseEntity<?> deleteRecipeBookmark(@PathVariable Long recipeBookmarkId){
         if (recipeBookmarkId != null && recipeBookmarkId != 0) {
             recipeBookmarkService.removeBookmark(recipeBookmarkId);
             return ResponseEntity.ok().build();

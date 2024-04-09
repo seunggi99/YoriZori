@@ -46,9 +46,9 @@ public class CartController {
         return new UpdateCartResponse(findCart.getId(), findCart.isPinned());
     }
 
-    @DeleteMapping("users/cart")
-    public ResponseEntity<?> removeAvoidIngredientFromUser(
-            @RequestBody @Valid Long cartId) {
+    @DeleteMapping("users/cart/{cartId}")
+    public ResponseEntity<?> removeCartFromUser(
+            @PathVariable Long cartId) {
         if (cartId != null && cartId != 0) {
             cartService.removeIngredientFromCart(cartId);
             return ResponseEntity.ok().build();
