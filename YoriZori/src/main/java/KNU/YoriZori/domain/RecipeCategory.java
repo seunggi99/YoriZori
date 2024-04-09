@@ -14,7 +14,7 @@ import java.util.List;
 public class RecipeCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ingredient_category_id")
+    @Column(name = "recipe_category_id")
     private Long id;
 
     private String name;
