@@ -1,5 +1,7 @@
 package KNU.YoriZori.service;
 
+import KNU.YoriZori.controller.UserController;
+import KNU.YoriZori.domain.AvoidIngredient;
 import KNU.YoriZori.domain.Recipe;
 import KNU.YoriZori.domain.RecipeBookmark;
 import KNU.YoriZori.domain.User;
@@ -46,8 +48,8 @@ public class RecipeBookmarkService {
 
     // 북마크 레시피 조회
     @Transactional(readOnly = true)
-    public List<Recipe> findBookmarksByUser(Long userId) {
-        List<RecipeBookmark> bookmarks = recipeBookmarkRepository.findAllByUserId(userId);
-        return bookmarks.stream().map(RecipeBookmark::getRecipe).collect(Collectors.toList());
+    public List<RecipeBookmark> findBookmarksByUser(Long userId) {
+        return recipeBookmarkRepository.findAllByUserId(userId);
     }
+
 }

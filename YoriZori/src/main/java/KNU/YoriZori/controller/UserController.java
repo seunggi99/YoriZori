@@ -2,7 +2,9 @@ package KNU.YoriZori.controller;
 
 
 import KNU.YoriZori.domain.User;
+import KNU.YoriZori.repository.RecipeBookmarkRepository;
 import KNU.YoriZori.service.AvoidIngredientService;
+import KNU.YoriZori.service.RecipeBookmarkService;
 import KNU.YoriZori.service.UserService;
 import jakarta.validation.Valid;
 import lombok.*;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 public class UserController {
     private final UserService userService;
     private final AvoidIngredientService avoidIngredientService;
+    private final RecipeBookmarkService recipeBookmarkService;
     // 회원 가입
     @PostMapping("/users")
     public CreateUserResponse saveUser(@RequestBody @Valid CreateUserRequest request) {
@@ -69,6 +72,7 @@ public class UserController {
 
     }
 
+    // 기피재료
     @PostMapping("users/{userId}/avoid-ingredients")
     public ResponseEntity<?> addAvoidIngredientToUser(@PathVariable Long userId, @RequestBody List<Long> ingredientIds) {
         for (Long ingredientId : ingredientIds) {
@@ -82,14 +86,16 @@ public class UserController {
         List<AvoidIngredientResponseDto> avoidIngredients = avoidIngredientService.getAvoidIngredientsByUserId(userId).stream()
                 .map(avoidIngredient -> new AvoidIngredientResponseDto(
                         avoidIngredient.getId(),
-                        avoidIngredient.getIngredient().getId()
+                        avoidIngredient.getIngredient().getId(),
+                        avoidIngredient.getIngredient().getImageUrl(),
+                        avoidIngredient.getIngredient().getCategoryId(),
+                        avoidIngredient.getIngredient().getName()
                 ))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(avoidIngredients);
     }
-    @DeleteMapping("users/{userId}/avoid-ingredients/{ingredientId}")
-    public ResponseEntity<?> removeAvoidIngredientFromUser(@PathVariable Long userId, @PathVariable Long ingredientId) {
-        Long avoidIngredientId = avoidIngredientService.findAvoidIngredientIdByUserIdAndIngredientId(userId, ingredientId);
+    @DeleteMapping("users/avoid-ingredients")
+    public ResponseEntity<?> removeAvoidIngredientFromUser(@RequestBody Long avoidIngredientId) {
         if (avoidIngredientId != null && avoidIngredientId != 0) {
             avoidIngredientService.removeAvoidIngredient(avoidIngredientId);
             return ResponseEntity.ok().build();
@@ -97,6 +103,39 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    // 레시피 북마크
+
+    @PostMapping("users/{userId}/bookmarks")
+    public ResponseEntity<?> addRecipeBookmarkToUser(@PathVariable Long userId, @RequestBody Long recipeId) {
+        recipeBookmarkService.addBookmark(userId, recipeId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("users/{userId}/bookmarks")
+    public ResponseEntity<List<RecipeBookmarkDto>> getRecipeBookmarkByUserId(@PathVariable Long userId) {
+        List<RecipeBookmarkDto> bookmarks = recipeBookmarkService.findBookmarksByUser(userId).stream()
+                .map(bookmark -> new RecipeBookmarkDto(
+                        bookmark.getId(),
+                        bookmark.getRecipe().getId(),
+                        bookmark.getRecipe().getName(),
+                        bookmark.getRecipe().getImageUrl()
+                ))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(bookmarks);
+    }
+
+    @DeleteMapping("users/bookmarks")
+    public ResponseEntity<?> deleteRecipeBookmark(@RequestBody Long recipeBookmarkId){
+        if (recipeBookmarkId != null && recipeBookmarkId != 0) {
+            recipeBookmarkService.removeBookmark(recipeBookmarkId);
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+
+    }
+
 
     @Data
     static class UpdateUserNicknameRequest{
@@ -150,6 +189,18 @@ public class UserController {
     public class AvoidIngredientResponseDto{
         private Long avoidIngredientId;
         private Long ingredientId;
+        private String imageUrl;
+        private Long categoryId;
+        private String name;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public class RecipeBookmarkDto{
+        private Long recipeBookmarkId;
+        private Long recipeId;
+        private String name;
+        private String imageUrl;
     }
 
 }

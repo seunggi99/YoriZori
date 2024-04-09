@@ -20,7 +20,4 @@ public class AvoidIngredient {
     @JoinColumn(name = "ingredient_id")
     private Ingredient ingredient;
 
-    public Long getIngredientId() {
-        return ingredient.getId();
-    }
 }
