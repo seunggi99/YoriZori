@@ -14,6 +14,6 @@ public class UserFilteredRecipeDetailsDto {
     private String cookingInstructions;
     private String imageUrl;
     private int insufficientIngredientsCount;
-    private List<Long> insufficientIngredients;
+    private List<IngredientInfoDto> insufficientIngredients;
 
 }

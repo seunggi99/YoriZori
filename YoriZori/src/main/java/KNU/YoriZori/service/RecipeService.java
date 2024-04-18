@@ -1,6 +1,7 @@
 package KNU.YoriZori.service;
 
 import KNU.YoriZori.domain.*;
+import KNU.YoriZori.dto.IngredientInfoDto;
 import KNU.YoriZori.dto.UserFilteredRecipeDetailsDto;
 import KNU.YoriZori.dto.UserFilteredRecipeDto;
 import KNU.YoriZori.repository.*;
@@ -103,9 +104,9 @@ public class RecipeService {
             // 각 레시피에 대한 부족한 재료 목록 조회
             List<Ingredient> insufficientIngredients = findInsufficientIngredient(recipe.getId(), fridgeId);
 
-            // 부족한 재료의 ID 목록 생성
-            List<Long> insufficientIngredientIds = insufficientIngredients.stream()
-                    .map(Ingredient::getId)
+            // 부족한 재료의 ID,이름 목록 생성
+            List<IngredientInfoDto> ingredientInfoDtos = insufficientIngredients.stream()
+                    .map(ingredient -> new IngredientInfoDto(ingredient.getId(), ingredient.getName()))
                     .collect(Collectors.toList());
 
             // UserFilteredRecipeDto 객체 생성 및 추가
@@ -114,7 +115,7 @@ public class RecipeService {
                     recipe.getName(),
                     recipe.getImageUrl(),
                     insufficientIngredients.size(), // 부족한 재료의 개수
-                    insufficientIngredientIds       // 부족한 재료 ID 목록
+                    ingredientInfoDtos         // 부족한 재료 ID 목록
             ));
         }
 
@@ -132,10 +133,10 @@ public class RecipeService {
         // 각 레시피에 대한 부족한 재료 목록 조회
         List<Ingredient> insufficientIngredients = findInsufficientIngredient(recipeId, fridgeId);
 
-        // 부족한 재료의 ID 목록 생성
-        List<Long> insufficientIngredientIds = insufficientIngredients.stream()
-                    .map(Ingredient::getId)
-                    .collect(Collectors.toList());
+        // 부족한 재료의 ID,이름 목록 생성
+        List<IngredientInfoDto> ingredientInfoDtos = insufficientIngredients.stream()
+                .map(ingredient -> new IngredientInfoDto(ingredient.getId(), ingredient.getName()))
+                .collect(Collectors.toList());
 
         // UserFilteredRecipeDto 객체 생성 및 추가
         filteredRecipes.add(new UserFilteredRecipeDetailsDto(
@@ -145,7 +146,7 @@ public class RecipeService {
                 recipe.getCookingInstructions(),
                 recipe.getImageUrl(),
                 insufficientIngredients.size(), // 부족한 재료의 개수
-                insufficientIngredientIds       // 부족한 재료 ID 목록
+                ingredientInfoDtos       // 부족한 재료 ID 목록
         ));
         return filteredRecipes;
     }
