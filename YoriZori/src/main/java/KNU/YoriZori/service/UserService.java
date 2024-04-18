@@ -7,16 +7,17 @@ import KNU.YoriZori.repository.FridgeRepository;
 import KNU.YoriZori.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-
 import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final FridgeRepository fridgeRepository;
     @Transactional
@@ -54,6 +55,13 @@ public class UserService {
 
     public Optional<User> authenticate(String name, String password) {
         return userRepository.findByNameAndPassword(name, password);
+    }
+
+
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByName(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+        return user;
     }
 
 }

@@ -1,6 +1,7 @@
 package KNU.YoriZori.controller;
 
 import KNU.YoriZori.domain.Recipe;
+import KNU.YoriZori.domain.User;
 import KNU.YoriZori.dto.UserFilteredRecipeDetailsDto;
 import KNU.YoriZori.dto.UserFilteredRecipeDto;
 import KNU.YoriZori.service.RecipeService;
@@ -8,8 +9,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -17,11 +20,12 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/recipes")
 public class RecipeController {
     private final RecipeService recipeService;
 
     // 모든 레시피 조회
-    @GetMapping("/recipes")
+    @GetMapping("/all")
     public ResponseEntity<List<RecipeDto>> getAllRecipes() {
         List<RecipeDto> recipes = recipeService.findAllRecipes()
                 .stream()
@@ -37,15 +41,15 @@ public class RecipeController {
     }
 
     // 회원 ID를 기반으로 기피 재료가 포함되지 않은 레시피 및 부족한 재료 조회
-    @GetMapping("/recipes/{fridgeId}")
-    public ResponseEntity<List<UserFilteredRecipeDto>> getUserFilteredRecipes(@PathVariable Long fridgeId ) {
-        List<UserFilteredRecipeDto> recipes = recipeService.findUserFilteredRecipes(fridgeId);
+    @GetMapping("/user-filtered")
+    public ResponseEntity<List<UserFilteredRecipeDto>> getUserFilteredRecipes(@AuthenticationPrincipal User user) {
+        List<UserFilteredRecipeDto> recipes = recipeService.findUserFilteredRecipes(user.getFridge().getId());
 
         return ResponseEntity.ok(recipes);
     }
 
     // 비회원 레시피 상세 페이지
-    @GetMapping("/recipes/guest/{recipeId}")
+    @GetMapping("/all/{recipeId}")
     public ResponseEntity<RecipeResponseDto> getRecipesDetail(@PathVariable Long recipeId){
         Recipe recipe = recipeService.findOne(recipeId);
         if (recipe == null) {
@@ -64,9 +68,9 @@ public class RecipeController {
     }
 
     // 회원 레시피 상세 페이지
-    @GetMapping("/recipes/{fridgeId}/{recipeId}")
-    public ResponseEntity<List<UserFilteredRecipeDetailsDto>> getUserFilteredRecipesDetail(@PathVariable Long fridgeId, @PathVariable Long recipeId){
-       List<UserFilteredRecipeDetailsDto> recipes = recipeService.findUserFilteredRecipeDetails(fridgeId,recipeId);
+    @GetMapping("/user-filtered/{recipeId}")
+    public ResponseEntity<List<UserFilteredRecipeDetailsDto>> getUserFilteredRecipesDetail(@AuthenticationPrincipal User user, @PathVariable Long recipeId){
+       List<UserFilteredRecipeDetailsDto> recipes = recipeService.findUserFilteredRecipeDetails(user.getFridge().getId(),recipeId);
 
         return ResponseEntity.ok(recipes);
     }

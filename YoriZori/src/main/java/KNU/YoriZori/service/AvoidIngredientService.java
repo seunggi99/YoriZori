@@ -18,7 +18,6 @@ public class AvoidIngredientService {
     private final AvoidIngredientRepository avoidIngredientRepository;
     private final UserRepository userRepository;
     private final IngredientRepository ingredientRepository;
-
     // 기피 재료 추가
     @Transactional
     public AvoidIngredient addAvoidIngredient(Long userId, Long ingredientId) {

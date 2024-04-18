@@ -2,13 +2,16 @@ package KNU.YoriZori.controller;
 
 
 import KNU.YoriZori.domain.User;
-import KNU.YoriZori.repository.RecipeBookmarkRepository;
 import KNU.YoriZori.service.AvoidIngredientService;
 import KNU.YoriZori.service.RecipeBookmarkService;
 import KNU.YoriZori.service.UserService;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import java.util.Collection;
 import jakarta.validation.Valid;
 import lombok.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,35 +24,41 @@ public class UserController {
     private final AvoidIngredientService avoidIngredientService;
     private final RecipeBookmarkService recipeBookmarkService;
     // 회원 가입
-    @PostMapping("/users")
-    public CreateUserResponse saveUser(@RequestBody @Valid CreateUserRequest request) {
-
-        User user = new User();
-        user.setName(request.getName());
-        user.setPassword(request.getPassword());
-        user.setNickname(request.getNickname());
-
-        Long id = userService.join(user);
-        return new CreateUserResponse(id); //test
-    }
+//    @PostMapping("/users")
+//    public CreateUserResponse saveUser(@RequestBody @Valid CreateUserRequest request) {
+//
+//        User user = new User();
+//        user.setName(request.getName());
+//        user.setPassword(request.getPassword());
+//        user.setNickname(request.getNickname());
+//
+//        Long id = userService.join(user);
+//        return new CreateUserResponse(id); //test
+//    }
 
     // 회원 닉네임 변경
-    @PutMapping("users/{id}")
-    public UpdateUserNicknameResponse updateUserNickname(
-            @PathVariable("id") Long id,
-            @RequestBody @Valid UpdateUserNicknameRequest request){
-        userService.updateNickname(id, request.getNickname());
-        User findUser = userService.findOne(id);
+//    @PutMapping("users/{id}")
+//    public UpdateUserNicknameResponse updateUserNickname(
+//            @PathVariable("id") Long id,
+//            @RequestBody @Valid UpdateUserNicknameRequest request){
+//        userService.updateNickname(id, request.getNickname());
+//        User findUser = userService.findOne(id);
+//        return new UpdateUserNicknameResponse(findUser.getId(), findUser.getNickname());
+//    }@AuthenticationPrincipal UserPrincipal userPrincipal
+
+    @PutMapping("users/update")
+    public UpdateUserNicknameResponse updateUserNickname(@AuthenticationPrincipal User userPrincipal,@RequestBody UpdateUserNicknameRequest request){
+        userService.updateNickname(userPrincipal.getId(), request.getNickname());
+        User findUser = userService.findOne(userPrincipal.getId());
         return new UpdateUserNicknameResponse(findUser.getId(), findUser.getNickname());
     }
 
-
-    @PostMapping("/login")
-    public ResponseEntity<ApiResponse> login(@RequestBody LoginRequest loginRequest) {
-        return userService.authenticate(loginRequest.getName(), loginRequest.getPassword())
-                .map(user -> ResponseEntity.ok(new ApiResponse(true, user.getId(), user.getNickname(), user.getFridge().getId())))
-                .orElse(ResponseEntity.ok(new ApiResponse(false, "아이디 혹은 비밀번호를 확인해주십시오.")));
-    }
+//    @PostMapping("/login")
+//    public ResponseEntity<ApiResponse> login(@RequestBody LoginRequest loginRequest) {
+//        return userService.authenticate(loginRequest.getName(), loginRequest.getPassword())
+//                .map(user -> ResponseEntity.ok(new ApiResponse(true, user.getId(), user.getNickname(), user.getFridge().getId())))
+//                .orElse(ResponseEntity.ok(new ApiResponse(false, "아이디 혹은 비밀번호를 확인해주십시오.")));
+//    }
 
     @Data
     public class ApiResponse {
@@ -73,17 +82,17 @@ public class UserController {
     }
 
     // 기피재료
-    @PostMapping("users/{userId}/avoid-ingredients")
-    public ResponseEntity<?> addAvoidIngredientToUser(@PathVariable Long userId, @RequestBody List<Long> ingredientIds) {
+    @PostMapping("users/avoid-ingredients")
+    public ResponseEntity<?> addAvoidIngredientToUser(@AuthenticationPrincipal User userPrincipal, @RequestBody List<Long> ingredientIds) {
         for (Long ingredientId : ingredientIds) {
-            avoidIngredientService.addAvoidIngredient(userId, ingredientId);
+            avoidIngredientService.addAvoidIngredient(userPrincipal.getId(), ingredientId);
         }
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("users/{userId}/avoid-ingredients")
-    public ResponseEntity<List<AvoidIngredientResponseDto>> getAvoidIngredientsByUserId(@PathVariable Long userId) {
-        List<AvoidIngredientResponseDto> avoidIngredients = avoidIngredientService.getAvoidIngredientsByUserId(userId).stream()
+    @GetMapping("users/avoid-ingredients")
+    public ResponseEntity<List<AvoidIngredientResponseDto>> getAvoidIngredientsByUserId(@AuthenticationPrincipal User userPrincipal) {
+        List<AvoidIngredientResponseDto> avoidIngredients = avoidIngredientService.getAvoidIngredientsByUserId(userPrincipal.getId()).stream()
                 .map(avoidIngredient -> new AvoidIngredientResponseDto(
                         avoidIngredient.getId(),
                         avoidIngredient.getIngredient().getId(),
@@ -106,15 +115,15 @@ public class UserController {
 
     // 레시피 북마크
 
-    @PostMapping("users/{userId}/bookmarks")
-    public ResponseEntity<?> addRecipeBookmarkToUser(@PathVariable Long userId, @RequestBody Long recipeId) {
-        recipeBookmarkService.addBookmark(userId, recipeId);
+    @PostMapping("users/bookmarks")
+    public ResponseEntity<?> addRecipeBookmarkToUser(@AuthenticationPrincipal User userPrincipal, @RequestBody Long recipeId) {
+        recipeBookmarkService.addBookmark(userPrincipal.getId(), recipeId);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("users/{userId}/bookmarks")
-    public ResponseEntity<List<RecipeBookmarkDto>> getRecipeBookmarkByUserId(@PathVariable Long userId) {
-        List<RecipeBookmarkDto> bookmarks = recipeBookmarkService.findBookmarksByUser(userId).stream()
+    @GetMapping("users/bookmarks")
+    public ResponseEntity<List<RecipeBookmarkDto>> getRecipeBookmarkByUserId(@AuthenticationPrincipal User userPrincipal) {
+        List<RecipeBookmarkDto> bookmarks = recipeBookmarkService.findBookmarksByUser(userPrincipal.getId()).stream()
                 .map(bookmark -> new RecipeBookmarkDto(
                         bookmark.getId(),
                         bookmark.getRecipe().getId(),

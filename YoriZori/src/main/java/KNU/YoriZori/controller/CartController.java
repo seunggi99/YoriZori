@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,23 +18,23 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CartController {
     private final CartService cartService;
-
-    @GetMapping("users/{userId}/cart")
-    public ResponseEntity<List<CartResponseDto>> getAvoidIngredientsByUserId(@PathVariable Long userId) {
-        List<CartResponseDto> avoidIngredients = cartService.getAllCartByUserId(userId).stream()
+    @GetMapping("users/cart")
+    public ResponseEntity<List<CartResponseDto>> getAvoidIngredientsByUserId(@AuthenticationPrincipal User user) {
+        List<CartResponseDto> carts = cartService.getAllCartByUserId(user.getId()).stream()
                 .map(cart -> new CartResponseDto(
                         cart.getId(),
                         cart.getIngredient().getId(),
                         cart.isPinned()
                 ))
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(avoidIngredients);
+        return ResponseEntity.ok(carts);
     }
 
-    @PostMapping("users/{userId}/cart")
-    public ResponseEntity<?> addAvoidIngredientToUser(@PathVariable Long userId, @RequestBody List<Long> ingredientIds) {
+
+    @PostMapping("users/cart")
+    public ResponseEntity<?> addAvoidIngredientToUser(@AuthenticationPrincipal User user, @RequestBody List<Long> ingredientIds) {
         for (Long ingredientId : ingredientIds) {
-            cartService.addIngredientToCart(userId, ingredientId);
+            cartService.addIngredientToCart(user.getId(), ingredientId);
         }
         return ResponseEntity.ok().build();
     }

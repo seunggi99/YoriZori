@@ -1,6 +1,7 @@
 package KNU.YoriZori.controller;
 
 import KNU.YoriZori.domain.StoragePlace;
+import KNU.YoriZori.domain.User;
 import KNU.YoriZori.dto.UpdatePutInRequestDto;
 import KNU.YoriZori.service.PutInService;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -22,25 +24,23 @@ public class PutInController {
     private final PutInService putInService;
 
     // 냉장고에 재료 추가
-    @PostMapping("/{fridgeId}/ingredients")
-    public ResponseEntity<Void> addIngredientToFridge(@PathVariable Long fridgeId, @RequestBody PutInDTO putInDTO) {
-        putInService.addIngredientToFridge(putInDTO.fridgeId, putInDTO.ingredientId, putInDTO.putDate, putInDTO.expDate, putInDTO.storagePlace);
+    @PostMapping("/ingredients")
+    public ResponseEntity<Void> addIngredientToFridge(@AuthenticationPrincipal User user,@RequestBody PutInDTO putInDTO) {
+        putInService.addIngredientToFridge(user.getFridge().getId(), putInDTO.ingredientId, putInDTO.putDate, putInDTO.expDate, putInDTO.storagePlace);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     // 냉장고에서 재료 제거
-    @DeleteMapping("/{fridgeId}/ingredients/{putInId}")
+    @DeleteMapping("/ingredients/{putInId}")
     public ResponseEntity<Void> removeIngredientFromFridge(
-            @PathVariable Long fridgeId,
             @PathVariable Long putInId) {
 
         putInService.removeIngredientFromFridge(putInId);
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{fridgeId}/ingredients/{putInId}")
+    @PutMapping("/ingredients/{putInId}")
     public ResponseEntity<List<PutInResponseDto>> updateIngredientFromFridge(
-            @PathVariable Long fridgeId,
             @PathVariable Long putInId,
             @RequestBody UpdatePutInRequestDto putInDTO){
         putInService.updatePutInFromFridge(putInId, putInDTO);
@@ -49,11 +49,11 @@ public class PutInController {
     }
 
     // 냉장고의 재료 목록 조회
-    @GetMapping("/{fridgeId}/ingredients")
+    @GetMapping("/ingredients")
     public ResponseEntity<List<PutInResponseDto>> getIngredientsInFridge(
-            @PathVariable Long fridgeId) {
+            @AuthenticationPrincipal User user) {
         putInService.updateAllDdays(); //디데이 업데이트
-        List<PutInResponseDto> ingredients = putInService.getIngredientsInFridge(fridgeId).stream()
+        List<PutInResponseDto> ingredients = putInService.getIngredientsInFridge(user.getFridge().getId()).stream()
                 .map(putIn -> new PutInResponseDto(
                         putIn.getId(),
                         putIn.getDDay(),
@@ -73,7 +73,6 @@ public class PutInController {
 
     @Data
     static class PutInDTO {
-        private Long fridgeId;
         private Long ingredientId;
         private LocalDate putDate;
         private LocalDate expDate;
