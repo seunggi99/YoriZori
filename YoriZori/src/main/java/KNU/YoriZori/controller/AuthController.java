@@ -28,4 +28,9 @@ public class AuthController {
     public ResponseEntity<ReqRes> refreshToken(@RequestBody ReqRes refreshTokenRequest){
         return ResponseEntity.ok(authService.refreshToken(refreshTokenRequest));
     }
+
+    @PostMapping("/validate")
+    public ResponseEntity<ReqRes> validateToken(@RequestBody ReqRes validateTokenRequest){
+        return ResponseEntity.ok(authService.validateToken(validateTokenRequest));
+    }
 }
