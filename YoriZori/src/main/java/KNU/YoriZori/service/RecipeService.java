@@ -122,32 +122,61 @@ public class RecipeService {
         return filteredRecipes;
     }
 
-    @Transactional
-    public List<UserFilteredRecipeDetailsDto> findUserFilteredRecipeDetails(Long fridgeId, Long recipeId) {
+//    @Transactional
+//    public List<UserFilteredRecipeDetailsDto> findUserFilteredRecipeDetails(Long fridgeId, Long recipeId) {
+//
+//        Long userId = userRepository.findByFridgeId(fridgeId).getId();
+//        Recipe recipe = findOne(recipeId);
+//        // 결과 DTO 리스트 생성
+//        List<UserFilteredRecipeDetailsDto> filteredRecipes = new ArrayList<>();
+//
+//        // 각 레시피에 대한 부족한 재료 목록 조회
+//        List<Ingredient> insufficientIngredients = findInsufficientIngredient(recipeId, fridgeId);
+//
+//        // 부족한 재료의 ID,이름 목록 생성
+//        List<IngredientInfoDto> ingredientInfoDtos = insufficientIngredients.stream()
+//                .map(ingredient -> new IngredientInfoDto(ingredient.getId(), ingredient.getName()))
+//                .collect(Collectors.toList());
+//
+//        // UserFilteredRecipeDto 객체 생성 및 추가
+//        filteredRecipes.add(new UserFilteredRecipeDetailsDto(
+//                recipe.getId(),
+//                recipe.getName(),
+//                recipe.getIntroduction(),
+//                recipe.getCookingInstructions(),
+//                recipe.getImageUrl(),
+//                insufficientIngredients.size(), // 부족한 재료의 개수
+//                ingredientInfoDtos       // 부족한 재료 ID 목록
+//        ));
+//        return filteredRecipes;
+//    }
 
+    @Transactional
+    public UserFilteredRecipeDetailsDto findUserFilteredRecipeDetails(Long fridgeId, Long recipeId) {
         Long userId = userRepository.findByFridgeId(fridgeId).getId();
         Recipe recipe = findOne(recipeId);
-        // 결과 DTO 리스트 생성
-        List<UserFilteredRecipeDetailsDto> filteredRecipes = new ArrayList<>();
+
+        if (recipe == null) {
+            return null; // 레시피가 존재하지 않으면 null 반환
+        }
 
         // 각 레시피에 대한 부족한 재료 목록 조회
         List<Ingredient> insufficientIngredients = findInsufficientIngredient(recipeId, fridgeId);
 
-        // 부족한 재료의 ID,이름 목록 생성
+        // 부족한 재료의 ID, 이름 목록 생성
         List<IngredientInfoDto> ingredientInfoDtos = insufficientIngredients.stream()
                 .map(ingredient -> new IngredientInfoDto(ingredient.getId(), ingredient.getName()))
                 .collect(Collectors.toList());
 
-        // UserFilteredRecipeDto 객체 생성 및 추가
-        filteredRecipes.add(new UserFilteredRecipeDetailsDto(
+        // UserFilteredRecipeDetailsDto 객체 생성 및 반환
+        return new UserFilteredRecipeDetailsDto(
                 recipe.getId(),
                 recipe.getName(),
                 recipe.getIntroduction(),
                 recipe.getCookingInstructions(),
                 recipe.getImageUrl(),
                 insufficientIngredients.size(), // 부족한 재료의 개수
-                ingredientInfoDtos       // 부족한 재료 ID 목록
-        ));
-        return filteredRecipes;
+                ingredientInfoDtos             // 부족한 재료 목록
+        );
     }
 }

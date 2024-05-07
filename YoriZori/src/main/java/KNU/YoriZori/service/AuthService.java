@@ -95,7 +95,6 @@ public class AuthService {
         try {
             String ourName = jwtUtils.extractUsername(validateTokenRequest.getToken());
             User user = ourUserRepo.findByName(ourName).orElseThrow(() -> new Exception("사용자를 찾을 수 없습니다."));
-            System.out.println("##############################");
             // 토큰 유효성 검사
             if (jwtUtils.isTokenValid(validateTokenRequest.getToken(), user)) {
                 response.setStatusCode(200); // OK
@@ -105,7 +104,6 @@ public class AuthService {
                 response.setMessage("유효하지 않은 토큰입니다.");
             }
         } catch (Exception e) {
-            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             // 예외 발생 시
             response.setStatusCode(500); // Internal Server Error
             response.setError(e.getMessage());

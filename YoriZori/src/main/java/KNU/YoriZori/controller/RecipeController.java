@@ -69,8 +69,8 @@ public class RecipeController {
 
     // 회원 레시피 상세 페이지
     @GetMapping("/user-filtered/{recipeId}")
-    public ResponseEntity<List<UserFilteredRecipeDetailsDto>> getUserFilteredRecipesDetail(@AuthenticationPrincipal User user, @PathVariable Long recipeId){
-       List<UserFilteredRecipeDetailsDto> recipes = recipeService.findUserFilteredRecipeDetails(user.getFridge().getId(),recipeId);
+    public ResponseEntity<UserFilteredRecipeDetailsDto> getUserFilteredRecipesDetail(@AuthenticationPrincipal User user, @PathVariable Long recipeId){
+       UserFilteredRecipeDetailsDto recipes = recipeService.findUserFilteredRecipeDetails(user.getFridge().getId(),recipeId);
 
         return ResponseEntity.ok(recipes);
     }
