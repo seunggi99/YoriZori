@@ -11,6 +11,7 @@ import java.util.List;
 public class UserFilteredRecipeDto {
     private Long id;
     private String name;
+    private int bookmarkCount;
     private String imageUrl;
     private int insufficientIngredientsCount;
     private List<IngredientInfoDto> insufficientIngredients;

@@ -10,8 +10,7 @@ import java.util.List;
 public class UserFilteredRecipeDetailsDto {
     private Long id;
     private String name;
-    private String introduction;
-    private String cookingInstructions;
+    private int bookmarkCount;
     private String imageUrl;
     private int insufficientIngredientsCount;
     private List<IngredientInfoDto> insufficientIngredients;

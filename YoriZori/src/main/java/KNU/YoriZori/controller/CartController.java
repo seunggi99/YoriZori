@@ -24,6 +24,8 @@ public class CartController {
                 .map(cart -> new CartResponseDto(
                         cart.getId(),
                         cart.getIngredient().getId(),
+                        cart.getIngredient().getName(),
+                        cart.getIngredient().getImageUrl(),
                         cart.isPinned()
                 ))
                 .collect(Collectors.toList());
@@ -63,6 +65,8 @@ public class CartController {
     public class CartResponseDto{
         private Long cartId;
         private Long ingredientId;
+        private String name;
+        private String imageUrl;
         private boolean pinned;
     }
 

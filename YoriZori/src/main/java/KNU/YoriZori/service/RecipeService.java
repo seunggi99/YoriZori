@@ -1,5 +1,6 @@
 package KNU.YoriZori.service;
 
+import KNU.YoriZori.controller.RecipeController;
 import KNU.YoriZori.domain.*;
 import KNU.YoriZori.dto.IngredientInfoDto;
 import KNU.YoriZori.dto.UserFilteredRecipeDetailsDto;
@@ -9,11 +10,17 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +33,16 @@ public class RecipeService {
     public Recipe findOne(Long recipeId) {
         return recipeRepository.findById(recipeId)
                 .orElseThrow(() -> new EntityNotFoundException("Recipe not found for id: " + recipeId));
+    }
+
+    @Transactional
+    public Recipe updateBookmarkCount(Long recipeId, int count) {
+        Recipe recipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> new EntityNotFoundException("Recipe not found with id " + recipeId));
+
+        recipe.setBookmarkCount(count);
+
+        return recipeRepository.save(recipe);
     }
 
     // 부족한 재료 반환
@@ -113,6 +130,7 @@ public class RecipeService {
             filteredRecipes.add(new UserFilteredRecipeDto(
                     recipe.getId(),
                     recipe.getName(),
+                    recipe.getBookmarkCount(),
                     recipe.getImageUrl(),
                     insufficientIngredients.size(), // 부족한 재료의 개수
                     ingredientInfoDtos         // 부족한 재료 ID 목록
@@ -122,34 +140,6 @@ public class RecipeService {
         return filteredRecipes;
     }
 
-//    @Transactional
-//    public List<UserFilteredRecipeDetailsDto> findUserFilteredRecipeDetails(Long fridgeId, Long recipeId) {
-//
-//        Long userId = userRepository.findByFridgeId(fridgeId).getId();
-//        Recipe recipe = findOne(recipeId);
-//        // 결과 DTO 리스트 생성
-//        List<UserFilteredRecipeDetailsDto> filteredRecipes = new ArrayList<>();
-//
-//        // 각 레시피에 대한 부족한 재료 목록 조회
-//        List<Ingredient> insufficientIngredients = findInsufficientIngredient(recipeId, fridgeId);
-//
-//        // 부족한 재료의 ID,이름 목록 생성
-//        List<IngredientInfoDto> ingredientInfoDtos = insufficientIngredients.stream()
-//                .map(ingredient -> new IngredientInfoDto(ingredient.getId(), ingredient.getName()))
-//                .collect(Collectors.toList());
-//
-//        // UserFilteredRecipeDto 객체 생성 및 추가
-//        filteredRecipes.add(new UserFilteredRecipeDetailsDto(
-//                recipe.getId(),
-//                recipe.getName(),
-//                recipe.getIntroduction(),
-//                recipe.getCookingInstructions(),
-//                recipe.getImageUrl(),
-//                insufficientIngredients.size(), // 부족한 재료의 개수
-//                ingredientInfoDtos       // 부족한 재료 ID 목록
-//        ));
-//        return filteredRecipes;
-//    }
 
     @Transactional
     public UserFilteredRecipeDetailsDto findUserFilteredRecipeDetails(Long fridgeId, Long recipeId) {
@@ -172,11 +162,34 @@ public class RecipeService {
         return new UserFilteredRecipeDetailsDto(
                 recipe.getId(),
                 recipe.getName(),
-                recipe.getIntroduction(),
-                recipe.getCookingInstructions(),
+                recipe.getBookmarkCount(),
                 recipe.getImageUrl(),
                 insufficientIngredients.size(), // 부족한 재료의 개수
                 ingredientInfoDtos             // 부족한 재료 목록
         );
+    }
+
+    private final WebClient webClient;
+
+    public Mono<RecipeController.RecipeResponseDto> getAdditionalRecipeInfo(String recipeName) {
+        return webClient.get()
+                .uri("/d4ae07f685a7424a9e0e/COOKRCP01/json/1/1/RCP_NM={recipeName}", recipeName)
+                .retrieve()
+                .bodyToMono(String.class) // JSON 응답을 문자열로 가져옴
+                .map(this::parseJsonToDto); // JSON을 RecipeResponseDto로 변환하여 반환
+    }
+
+    public RecipeController.RecipeResponseDto parseJsonToDto(String jsonResponse) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+            JsonNode recipeNode = jsonNode.path("COOKRCP01").path("row").get(0);
+            return objectMapper.treeToValue(recipeNode, RecipeController.RecipeResponseDto.class);
+        } catch (JsonProcessingException e) {
+            // JSON을 DTO로 변환하는 중에 예외가 발생하면 처리
+            System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4");
+            e.printStackTrace(); // 예외 처리 방법은 상황에 따라 다를 수 있습니다.
+            return null;
+        }
     }
 }

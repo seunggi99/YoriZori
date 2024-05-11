@@ -116,6 +116,11 @@ public class UserController {
     // 레시피 북마크
 
     @PostMapping("users/bookmarks")
+    public ResponseEntity<?> updateRecipeBookmarkCount(@AuthenticationPrincipal User userPrincipal, @RequestBody Long recipeId) {
+        recipeBookmarkService.addBookmark(userPrincipal.getId(), recipeId);
+        return ResponseEntity.ok().build();
+    }
+    @PutMapping("users/bookmarks")
     public ResponseEntity<?> addRecipeBookmarkToUser(@AuthenticationPrincipal User userPrincipal, @RequestBody Long recipeId) {
         recipeBookmarkService.addBookmark(userPrincipal.getId(), recipeId);
         return ResponseEntity.ok().build();

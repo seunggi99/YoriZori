@@ -8,4 +8,4 @@
 /dataSources.local.xml
 
 # application.properties 추적 제외
-/src/main/resources/application.properties
+src/main/resources/application.properties

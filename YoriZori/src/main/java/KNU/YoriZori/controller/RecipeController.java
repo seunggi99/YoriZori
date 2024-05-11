@@ -8,12 +8,11 @@ import KNU.YoriZori.service.RecipeService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,6 +31,7 @@ public class RecipeController {
                 .map(recipe -> new RecipeDto(
                         recipe.getId(),
                         recipe.getName(),
+                        recipe.getBookmarkCount(),
                         recipe.getImageUrl(),
                         recipe.getCategory().getId(),
                         recipe.getCategory().getName()
@@ -48,23 +48,53 @@ public class RecipeController {
         return ResponseEntity.ok(recipes);
     }
 
-    // 비회원 레시피 상세 페이지
+//    // 비회원 레시피 상세 페이지
+//    @GetMapping("/all/{recipeId}")
+//    public ResponseEntity<RecipeResponseDto> getRecipesDetail(@PathVariable Long recipeId){
+//        Recipe recipe = recipeService.findOne(recipeId);
+//        if (recipe == null) {
+//            return ResponseEntity.notFound().build();
+//        }
+//        RecipeResponseDto responseDto = new RecipeResponseDto(
+//                recipe.getId(),
+//                recipe.getName(),
+//                recipe.getIntroduction(),
+//                recipe.getCookingInstructions(),
+//                recipe.getImageUrl(),
+//                recipe.getCategory().getId(),
+//                recipe.getCategory().getName()
+//        );
+//        return ResponseEntity.ok(responseDto);
+//    }
+
     @GetMapping("/all/{recipeId}")
-    public ResponseEntity<RecipeResponseDto> getRecipesDetail(@PathVariable Long recipeId){
+    public Mono<ResponseEntity<RecipeResponseDto>> getRecipesDetail(@PathVariable Long recipeId) {
         Recipe recipe = recipeService.findOne(recipeId);
         if (recipe == null) {
-            return ResponseEntity.notFound().build();
+            return Mono.just(ResponseEntity.notFound().build());
         }
-        RecipeResponseDto responseDto = new RecipeResponseDto(
-                recipe.getId(),
-                recipe.getName(),
-                recipe.getIntroduction(),
-                recipe.getCookingInstructions(),
-                recipe.getImageUrl(),
-                recipe.getCategory().getId(),
-                recipe.getCategory().getName()
-        );
-        return ResponseEntity.ok(responseDto);
+
+        return recipeService.getAdditionalRecipeInfo(recipe.getName())
+                .map(additionalInfo -> {
+                    if (additionalInfo == null) {
+                        // 만약 additionalInfo가 null이면 예외 상황 처리
+                        // 이 경우에는 예를 들어 빈 RecipeResponseDto를 반환하거나 다른 적절한 처리를 수행할 수 있습니다.
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                    }
+
+                    RecipeResponseDto responseDto = new RecipeResponseDto(
+                            recipe.getId(),
+                            recipe.getName(),
+                            recipe.getBookmarkCount(),
+                            recipe.getImageUrl(),
+                            recipe.getCategory().getId(),
+                            recipe.getCategory().getName(),
+                            additionalInfo.getRCP_PARTS_DTLS(),
+                            additionalInfo.getMANUAL(),
+                            additionalInfo.getMANUAL_IMG()
+                    );
+                    return ResponseEntity.ok(responseDto);
+                });
     }
 
     // 회원 레시피 상세 페이지
@@ -76,16 +106,28 @@ public class RecipeController {
     }
 
 
+    //레시피 북마크 개수 업데이트
+    @PatchMapping("/update/{recipeId}")
+    public ResponseEntity<?> updateRecipeBookmarkCount(@PathVariable Long recipeId, @RequestBody int count) {
+        recipeService.updateBookmarkCount(recipeId, count);
+        return ResponseEntity.ok().build();
+    }
     @Data
     @AllArgsConstructor
-    private static class RecipeResponseDto {
+    public static class RecipeResponseDto {
+
+        public RecipeResponseDto() {
+            // 기본 생성자 추가
+        }
         private Long id;
         private String name;
-        private String introduction;
-        private String cookingInstructions;
+        private int BookmarkCount;
         private String imageUrl;
         private Long categoryId;
         private String categoryName;
+        private String RCP_PARTS_DTLS;
+        private List<String> MANUAL;
+        private List<String> MANUAL_IMG;
     }
 
     @Data
@@ -93,6 +135,7 @@ public class RecipeController {
     private static class RecipeDto {
         private Long id;
         private String name;
+        private int BookmarkCount;
         private String imageUrl;
         private Long categoryId;
         private String categoryName;
@@ -107,6 +150,7 @@ public class RecipeController {
         private String imageUrl;
         private int insufficientIngredientsCount;
         private List<Long> insufficientIngredients;
+
 
     }
 }

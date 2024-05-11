@@ -20,10 +20,7 @@ public class Recipe {
 
     private String name;
 
-    private String introduction;
-
-    @Lob
-    private String cookingInstructions;
+    private int bookmarkCount;
 
     private String imageUrl;
 
