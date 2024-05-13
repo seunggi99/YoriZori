@@ -72,14 +72,36 @@ public class PutInService {
         return putInRepository.findAllByFridgeId(fridgeId);
     }
 
+//    @Async
+//    public void updateAllDdays() {
+//        List<PutIn> allPutIns = putInRepository.findAll();
+//        LocalDate today = LocalDate.now();
+//        allPutIns.forEach(putIn -> {
+//            long dDay = ChronoUnit.DAYS.between(today, putIn.getExpDate());
+//            putIn.setDDay((int)dDay);
+//        });
+//        putInRepository.saveAll(allPutIns);
+//    }
+
     @Async
     public void updateAllDdays() {
-        List<PutIn> allPutIns = putInRepository.findAll();
-        LocalDate today = LocalDate.now();
-        allPutIns.forEach(putIn -> {
-            long dDay = ChronoUnit.DAYS.between(today, putIn.getExpDate());
-            putIn.setDDay((int)dDay);
+        List<PutIn> putIns = putInRepository.findAll();
+        LocalDate currentDate = LocalDate.now();
+        putIns.forEach(putIn -> {
+            LocalDate storedDate = putIn.getExpDate();
+            if (storedDate != null) {
+                try {
+                    long daysBetween = ChronoUnit.DAYS.between(currentDate, storedDate);
+                    putIn.setDDay((int)daysBetween);
+                } catch (Exception e) {
+                    // 오류 로깅
+                    System.out.println("Error calculating days between dates: " + e.getMessage());
+                }
+            } else {
+                // storedDate가 null일 때의 로직 처리
+                System.out.println("Stored date is null for PutIn ID: " + putIn.getId());
+            }
+            putInRepository.save(putIn);
         });
-        putInRepository.saveAll(allPutIns);
     }
 }
