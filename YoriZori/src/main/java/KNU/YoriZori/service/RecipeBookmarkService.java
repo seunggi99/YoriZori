@@ -52,4 +52,9 @@ public class RecipeBookmarkService {
         return recipeBookmarkRepository.findAllByUserId(userId);
     }
 
+    @Transactional(readOnly = true)
+    public boolean isRecipeBookmarked(Long userId, Long recipeId) {
+        return recipeBookmarkRepository.existsByUserIdAndRecipeId(userId, recipeId);
+    }
+
 }

@@ -139,6 +139,11 @@ public class UserController {
         return ResponseEntity.ok(bookmarks);
     }
 
+    @GetMapping("users/check-bookmark")
+    public boolean isRecipeBookmarked(@AuthenticationPrincipal User userPrincipal, @RequestParam Long recipeId) {
+        return recipeBookmarkService.isRecipeBookmarked(userPrincipal.getId(), recipeId);
+    }
+
     @DeleteMapping("users/bookmarks/{recipeBookmarkId}")
     public ResponseEntity<?> deleteRecipeBookmark(@PathVariable Long recipeBookmarkId){
         if (recipeBookmarkId != null && recipeBookmarkId != 0) {

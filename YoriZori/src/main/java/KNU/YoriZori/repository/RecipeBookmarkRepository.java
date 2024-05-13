@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface RecipeBookmarkRepository extends JpaRepository<RecipeBookmark, Long> {
     List<RecipeBookmark> findAllByUserId(Long userId);
+    boolean existsByUserIdAndRecipeId(Long userId, Long recipeId);
 }
