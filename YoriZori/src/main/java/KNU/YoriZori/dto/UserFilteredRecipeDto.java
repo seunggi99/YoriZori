@@ -13,6 +13,8 @@ public class UserFilteredRecipeDto {
     private String name;
     private int bookmarkCount;
     private String imageUrl;
+    private Long categoryId;
+    private String categoryName;
     private int insufficientIngredientsCount;
     private List<IngredientInfoDto> insufficientIngredients;
 }

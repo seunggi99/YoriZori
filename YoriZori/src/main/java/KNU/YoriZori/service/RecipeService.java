@@ -3,13 +3,17 @@ package KNU.YoriZori.service;
 import KNU.YoriZori.controller.RecipeController;
 import KNU.YoriZori.domain.*;
 import KNU.YoriZori.dto.IngredientInfoDto;
+import KNU.YoriZori.dto.RecipeDetailsDto;
 import KNU.YoriZori.dto.UserFilteredRecipeDetailsDto;
 import KNU.YoriZori.dto.UserFilteredRecipeDto;
 import KNU.YoriZori.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -132,6 +136,8 @@ public class RecipeService {
                     recipe.getName(),
                     recipe.getBookmarkCount(),
                     recipe.getImageUrl(),
+                    recipe.getCategory().getId(),
+                    recipe.getCategory().getName(),
                     insufficientIngredients.size(), // 부족한 재료의 개수
                     ingredientInfoDtos         // 부족한 재료 ID 목록
             ));
@@ -143,7 +149,6 @@ public class RecipeService {
 
     @Transactional
     public UserFilteredRecipeDetailsDto findUserFilteredRecipeDetails(Long fridgeId, Long recipeId) {
-        Long userId = userRepository.findByFridgeId(fridgeId).getId();
         Recipe recipe = findOne(recipeId);
 
         if (recipe == null) {
@@ -164,32 +169,99 @@ public class RecipeService {
                 recipe.getName(),
                 recipe.getBookmarkCount(),
                 recipe.getImageUrl(),
+                recipe.getCategory().getId(),
+                recipe.getCategory().getName(),
                 insufficientIngredients.size(), // 부족한 재료의 개수
-                ingredientInfoDtos             // 부족한 재료 목록
+                ingredientInfoDtos,
+                null,
+                null,
+                null
         );
     }
 
     private final WebClient webClient;
 
-    public Mono<RecipeController.RecipeResponseDto> getAdditionalRecipeInfo(String recipeName) {
-        return webClient.get()
-                .uri("/d4ae07f685a7424a9e0e/COOKRCP01/json/1/1/RCP_NM={recipeName}", recipeName)
-                .retrieve()
-                .bodyToMono(String.class) // JSON 응답을 문자열로 가져옴
-                .map(this::parseJsonToDto); // JSON을 RecipeResponseDto로 변환하여 반환
+    public void fetchAndMergeExternalData(RecipeDetailsDto recipeDetails) {
+        String recipeName = recipeDetails.getName();
+        String apiUrl = "http://openapi.foodsafetykorea.go.kr/api/d4ae07f685a7424a9e0e/COOKRCP01/json/1/1/RCP_NM=" + recipeName;
+        RestTemplate restTemplate = new RestTemplate();
+        String response = restTemplate.getForObject(apiUrl, String.class);
+
+        try {
+            JSONObject jsonResponse = new JSONObject(response);
+            JSONArray recipes = jsonResponse.getJSONObject("COOKRCP01").getJSONArray("row");
+
+            if (recipes.length() > 0) {
+                JSONObject recipe = recipes.getJSONObject(0);
+                recipeDetails.setIngredientDetails(recipe.optString("RCP_PARTS_DTLS"));
+
+                List<String> manualSteps = new ArrayList<>();
+                List<String> manualImages = new ArrayList<>();
+
+                for (int i = 1; i <= 20; i++) {
+                    String manualStepKey = String.format("MANUAL%02d", i);
+                    String manualImgKey = String.format("MANUAL_IMG%02d", i);
+
+                    String manualStep = recipe.optString(manualStepKey);
+                    String manualImg = recipe.optString(manualImgKey);
+
+                    if (!manualStep.isEmpty()) {
+                        manualSteps.add(manualStep);
+                    }
+
+                    if (!manualImg.isEmpty()) {
+                        manualImages.add(manualImg);
+                    }
+                }
+
+                recipeDetails.setManual(manualSteps);
+                recipeDetails.setManualImg(manualImages);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public RecipeController.RecipeResponseDto parseJsonToDto(String jsonResponse) {
+    public void fetchAndMergeExternalData(UserFilteredRecipeDetailsDto recipeDetails) {
+        String recipeName = recipeDetails.getName();
+        String apiUrl = "http://openapi.foodsafetykorea.go.kr/api/d4ae07f685a7424a9e0e/COOKRCP01/json/1/1/RCP_NM=" + recipeName;
+        RestTemplate restTemplate = new RestTemplate();
+        String response = restTemplate.getForObject(apiUrl, String.class);
+
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-            JsonNode recipeNode = jsonNode.path("COOKRCP01").path("row").get(0);
-            return objectMapper.treeToValue(recipeNode, RecipeController.RecipeResponseDto.class);
-        } catch (JsonProcessingException e) {
-            // JSON을 DTO로 변환하는 중에 예외가 발생하면 처리
-            System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4");
-            e.printStackTrace(); // 예외 처리 방법은 상황에 따라 다를 수 있습니다.
-            return null;
+            JSONObject jsonResponse = new JSONObject(response);
+            JSONArray recipes = jsonResponse.getJSONObject("COOKRCP01").getJSONArray("row");
+
+            if (recipes.length() > 0) {
+                JSONObject recipe = recipes.getJSONObject(0);
+                recipeDetails.setIngredientDetails(recipe.optString("RCP_PARTS_DTLS"));
+
+                List<String> manualSteps = new ArrayList<>();
+                List<String> manualImages = new ArrayList<>();
+
+                for (int i = 1; i <= 20; i++) {
+                    String manualStepKey = String.format("MANUAL%02d", i);
+                    String manualImgKey = String.format("MANUAL_IMG%02d", i);
+
+                    String manualStep = recipe.optString(manualStepKey);
+                    String manualImg = recipe.optString(manualImgKey);
+
+                    if (!manualStep.isEmpty()) {
+                        manualSteps.add(manualStep);
+                    }
+
+                    if (!manualImg.isEmpty()) {
+                        manualImages.add(manualImg);
+                    }
+                }
+
+                recipeDetails.setManual(manualSteps);
+                recipeDetails.setManualImg(manualImages);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

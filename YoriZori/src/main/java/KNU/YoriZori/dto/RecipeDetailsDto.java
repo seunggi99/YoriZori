@@ -7,16 +7,13 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class UserFilteredRecipeDetailsDto {
+public class RecipeDetailsDto {
     private Long id;
     private String name;
-    private int bookmarkCount;
+    private int BookmarkCount;
     private String imageUrl;
     private Long categoryId;
     private String categoryName;
-
-    private int insufficientIngredientsCount;
-    private List<IngredientInfoDto> insufficientIngredients;
 
     private String ingredientDetails; // RCP_PARTS_DTLS 추가
     private List<String> manual; // MANUAL 추가

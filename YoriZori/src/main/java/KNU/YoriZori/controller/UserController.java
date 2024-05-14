@@ -140,10 +140,11 @@ public class UserController {
     }
 
     @GetMapping("users/check-bookmark")
-    public boolean isRecipeBookmarked(@AuthenticationPrincipal User userPrincipal, @RequestParam Long recipeId) {
-        return recipeBookmarkService.isRecipeBookmarked(userPrincipal.getId(), recipeId);
+    public isRecipeBookmarkedResponse isRecipeBookmarked(@AuthenticationPrincipal User userPrincipal, @RequestParam Long recipeId) {
+        boolean isBookmarked = recipeBookmarkService.isRecipeBookmarked(userPrincipal.getId(), recipeId);
+        isRecipeBookmarkedResponse bookmarkedResponse = new isRecipeBookmarkedResponse(isBookmarked);
+        return bookmarkedResponse;
     }
-
     @DeleteMapping("users/bookmarks/{recipeBookmarkId}")
     public ResponseEntity<?> deleteRecipeBookmark(@PathVariable Long recipeBookmarkId){
         if (recipeBookmarkId != null && recipeBookmarkId != 0) {
@@ -175,32 +176,9 @@ public class UserController {
     }
 
     @Data
-    static class CreateUserResponse {
-        private Long id;
-        public CreateUserResponse(Long id) {
-            this.id = id;
-        }
-    }
-    @Data
-    public class UserResponseDTO {
-        private Long id;
-        private String password;
-        private String nickname;
-    }
-
-    @Data
-    @NoArgsConstructor
-    public static class LoginRequest {
-        private String name;
-        private String password;
-    }
-
-    @Data
     @AllArgsConstructor
-    public class LoginResponse {
-        private Long id;
-        private String nickname;
-
+    static class isRecipeBookmarkedResponse {
+        boolean BookmarkCheck;
     }
 
     @Data

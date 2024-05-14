@@ -2,6 +2,7 @@ package KNU.YoriZori.controller;
 
 import KNU.YoriZori.domain.Recipe;
 import KNU.YoriZori.domain.User;
+import KNU.YoriZori.dto.RecipeDetailsDto;
 import KNU.YoriZori.dto.UserFilteredRecipeDetailsDto;
 import KNU.YoriZori.dto.UserFilteredRecipeDto;
 import KNU.YoriZori.service.RecipeService;
@@ -44,64 +45,40 @@ public class RecipeController {
     @GetMapping("/user-filtered")
     public ResponseEntity<List<UserFilteredRecipeDto>> getUserFilteredRecipes(@AuthenticationPrincipal User user) {
         List<UserFilteredRecipeDto> recipes = recipeService.findUserFilteredRecipes(user.getFridge().getId());
-
         return ResponseEntity.ok(recipes);
     }
 
-//    // 비회원 레시피 상세 페이지
-//    @GetMapping("/all/{recipeId}")
-//    public ResponseEntity<RecipeResponseDto> getRecipesDetail(@PathVariable Long recipeId){
-//        Recipe recipe = recipeService.findOne(recipeId);
-//        if (recipe == null) {
-//            return ResponseEntity.notFound().build();
-//        }
-//        RecipeResponseDto responseDto = new RecipeResponseDto(
-//                recipe.getId(),
-//                recipe.getName(),
-//                recipe.getIntroduction(),
-//                recipe.getCookingInstructions(),
-//                recipe.getImageUrl(),
-//                recipe.getCategory().getId(),
-//                recipe.getCategory().getName()
-//        );
-//        return ResponseEntity.ok(responseDto);
-//    }
-
+    // 비회원 레시피 상세 페이지
     @GetMapping("/all/{recipeId}")
-    public Mono<ResponseEntity<RecipeResponseDto>> getRecipesDetail(@PathVariable Long recipeId) {
+    public ResponseEntity<RecipeDetailsDto> getRecipesDetail2(@PathVariable Long recipeId){
         Recipe recipe = recipeService.findOne(recipeId);
         if (recipe == null) {
-            return Mono.just(ResponseEntity.notFound().build());
+            return ResponseEntity.notFound().build();
         }
 
-        return recipeService.getAdditionalRecipeInfo(recipe.getName())
-                .map(additionalInfo -> {
-                    if (additionalInfo == null) {
-                        // 만약 additionalInfo가 null이면 예외 상황 처리
-                        // 이 경우에는 예를 들어 빈 RecipeResponseDto를 반환하거나 다른 적절한 처리를 수행할 수 있습니다.
-                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-                    }
 
-                    RecipeResponseDto responseDto = new RecipeResponseDto(
-                            recipe.getId(),
-                            recipe.getName(),
-                            recipe.getBookmarkCount(),
-                            recipe.getImageUrl(),
-                            recipe.getCategory().getId(),
-                            recipe.getCategory().getName(),
-                            additionalInfo.getRCP_PARTS_DTLS(),
-                            additionalInfo.getMANUAL(),
-                            additionalInfo.getMANUAL_IMG()
-                    );
-                    return ResponseEntity.ok(responseDto);
-                });
+        RecipeDetailsDto responseDto = new RecipeDetailsDto(
+                recipe.getId(),
+                recipe.getName(),
+                recipe.getBookmarkCount(),
+                recipe.getImageUrl(),
+                recipe.getCategory().getId(),
+                recipe.getCategory().getName(),
+                null,
+                null,
+                null
+        );
+        recipeService.fetchAndMergeExternalData(responseDto);
+
+        return ResponseEntity.ok(responseDto);
     }
+
 
     // 회원 레시피 상세 페이지
     @GetMapping("/user-filtered/{recipeId}")
     public ResponseEntity<UserFilteredRecipeDetailsDto> getUserFilteredRecipesDetail(@AuthenticationPrincipal User user, @PathVariable Long recipeId){
         UserFilteredRecipeDetailsDto recipes = recipeService.findUserFilteredRecipeDetails(user.getFridge().getId(),recipeId);
-
+        recipeService.fetchAndMergeExternalData(recipes);
         return ResponseEntity.ok(recipes);
     }
 
@@ -111,23 +88,6 @@ public class RecipeController {
     public ResponseEntity<?> updateRecipeBookmarkCount(@PathVariable Long recipeId, @RequestBody int count) {
         recipeService.updateBookmarkCount(recipeId, count);
         return ResponseEntity.ok().build();
-    }
-    @Data
-    @AllArgsConstructor
-    public static class RecipeResponseDto {
-
-        public RecipeResponseDto() {
-            // 기본 생성자 추가
-        }
-        private Long id;
-        private String name;
-        private int BookmarkCount;
-        private String imageUrl;
-        private Long categoryId;
-        private String categoryName;
-        private String RCP_PARTS_DTLS;
-        private List<String> MANUAL;
-        private List<String> MANUAL_IMG;
     }
 
     @Data
@@ -140,17 +100,5 @@ public class RecipeController {
         private Long categoryId;
         private String categoryName;
     }
-    @Data
-    @AllArgsConstructor
-    public static class RecipeDetailsDto {
-        private Long id;
-        private String name;
-        private String introduction;
-        private String cookingInstructions;
-        private String imageUrl;
-        private int insufficientIngredientsCount;
-        private List<Long> insufficientIngredients;
 
-
-    }
 }
