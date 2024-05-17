@@ -6,6 +6,7 @@ import KNU.YoriZori.dto.RecipeDetailsDto;
 import KNU.YoriZori.dto.UserFilteredRecipeDetailsDto;
 import KNU.YoriZori.dto.UserFilteredRecipeDto;
 import KNU.YoriZori.service.RecipeService;
+import KNU.YoriZori.service.RecipeStorageService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +26,23 @@ import java.util.stream.Collectors;
 @RequestMapping("/recipes")
 public class RecipeController {
     private final RecipeService recipeService;
+    private final RecipeStorageService storageService;
+    // 레시피, 재료 추가
+    @PostMapping("/import-recipes")
+    public ResponseEntity<String> uploadJsonData(@RequestParam("file") MultipartFile file) {
+        try {
+            if (file.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File is empty");
+            }
 
+            String jsonData = new String(file.getBytes());
+            storageService.saveRecipesFromJson(jsonData);
+            return ResponseEntity.status(HttpStatus.OK).body("Recipes imported successfully.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to import recipes.");
+        }
+    }
     // 모든 레시피 조회
     @GetMapping("/all")
     public ResponseEntity<List<RecipeDto>> getAllRecipes() {

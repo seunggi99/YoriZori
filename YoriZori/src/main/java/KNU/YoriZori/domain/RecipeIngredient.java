@@ -21,6 +21,6 @@ public class RecipeIngredient {
     private Recipe recipe;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "ingredient_id")
+    @JoinColumn(name = "ingredient_id", foreignKey = @ForeignKey(name = "FK_recipe_ingredient_ingredient_id", value = ConstraintMode.CONSTRAINT, foreignKeyDefinition = "FOREIGN KEY (ingredient_id) REFERENCES ingredient (ingredient_id) ON DELETE CASCADE"))
     private Ingredient ingredient;
 }
