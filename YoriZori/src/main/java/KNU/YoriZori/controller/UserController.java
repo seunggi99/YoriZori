@@ -1,9 +1,12 @@
 package KNU.YoriZori.controller;
 
 
+import KNU.YoriZori.domain.Ingredient;
 import KNU.YoriZori.domain.User;
+import KNU.YoriZori.dto.IngredientInfoDto;
 import KNU.YoriZori.service.AvoidIngredientService;
 import KNU.YoriZori.service.RecipeBookmarkService;
+import KNU.YoriZori.service.RecipeService;
 import KNU.YoriZori.service.UserService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,28 +26,7 @@ public class UserController {
     private final UserService userService;
     private final AvoidIngredientService avoidIngredientService;
     private final RecipeBookmarkService recipeBookmarkService;
-    // 회원 가입
-//    @PostMapping("/users")
-//    public CreateUserResponse saveUser(@RequestBody @Valid CreateUserRequest request) {
-//
-//        User user = new User();
-//        user.setName(request.getName());
-//        user.setPassword(request.getPassword());
-//        user.setNickname(request.getNickname());
-//
-//        Long id = userService.join(user);
-//        return new CreateUserResponse(id); //test
-//    }
-
-    // 회원 닉네임 변경
-//    @PutMapping("users/{id}")
-//    public UpdateUserNicknameResponse updateUserNickname(
-//            @PathVariable("id") Long id,
-//            @RequestBody @Valid UpdateUserNicknameRequest request){
-//        userService.updateNickname(id, request.getNickname());
-//        User findUser = userService.findOne(id);
-//        return new UpdateUserNicknameResponse(findUser.getId(), findUser.getNickname());
-//    }@AuthenticationPrincipal UserPrincipal userPrincipal
+    private final RecipeService recipeService;
 
     @PutMapping("users/update")
     public UpdateUserNicknameResponse updateUserNickname(@AuthenticationPrincipal User userPrincipal,@RequestBody UpdateUserNicknameRequest request){
@@ -52,13 +34,6 @@ public class UserController {
         User findUser = userService.findOne(userPrincipal.getId());
         return new UpdateUserNicknameResponse(findUser.getId(), findUser.getNickname());
     }
-
-//    @PostMapping("/login")
-//    public ResponseEntity<ApiResponse> login(@RequestBody LoginRequest loginRequest) {
-//        return userService.authenticate(loginRequest.getName(), loginRequest.getPassword())
-//                .map(user -> ResponseEntity.ok(new ApiResponse(true, user.getId(), user.getNickname(), user.getFridge().getId())))
-//                .orElse(ResponseEntity.ok(new ApiResponse(false, "아이디 혹은 비밀번호를 확인해주십시오.")));
-//    }
 
     @Data
     public class ApiResponse {
@@ -128,13 +103,27 @@ public class UserController {
 
     @GetMapping("users/bookmarks")
     public ResponseEntity<List<RecipeBookmarkDto>> getRecipeBookmarkByUserId(@AuthenticationPrincipal User userPrincipal) {
+
         List<RecipeBookmarkDto> bookmarks = recipeBookmarkService.findBookmarksByUser(userPrincipal.getId()).stream()
-                .map(bookmark -> new RecipeBookmarkDto(
-                        bookmark.getId(),
-                        bookmark.getRecipe().getId(),
-                        bookmark.getRecipe().getName(),
-                        bookmark.getRecipe().getImageUrl()
-                ))
+                .map(bookmark -> {
+                    Long recipeId = bookmark.getRecipe().getId();
+                    Long fridgeId = userPrincipal.getFridge().getId();
+                    List<Ingredient> insufficientIngredients = recipeService.findInsufficientIngredient(recipeId, fridgeId);
+
+                    return new RecipeBookmarkDto(
+                            bookmark.getId(),
+                            recipeId,
+                            bookmark.getRecipe().getName(),
+                            bookmark.getRecipe().getImageUrl(),
+                            bookmark.getRecipe().getBookmarkCount(),
+                            bookmark.getRecipe().getCategory().getId(),
+                            bookmark.getRecipe().getCategory().getName(),
+                            insufficientIngredients.size(),
+                            insufficientIngredients.stream()
+                                    .map(ingredient -> new IngredientInfoDto(ingredient.getId(), ingredient.getName()))
+                                    .collect(Collectors.toList())
+                    );
+                })
                 .collect(Collectors.toList());
         return ResponseEntity.ok(bookmarks);
     }
@@ -198,6 +187,11 @@ public class UserController {
         private Long recipeId;
         private String name;
         private String imageUrl;
+        private int BookmarkCount;
+        private Long categoryId;
+        private String categoryName;
+        private int insufficientIngredientsCount;
+        private List<IngredientInfoDto> insufficientIngredients;
     }
 
 }
