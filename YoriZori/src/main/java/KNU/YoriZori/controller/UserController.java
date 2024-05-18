@@ -88,6 +88,8 @@ public class UserController {
         }
     }
 
+
+
     // 레시피 북마크
 
     @PostMapping("users/bookmarks")
@@ -143,6 +145,16 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
 
+    }
+
+    @DeleteMapping("users/bookmarks2/{recipeId}")
+    public ResponseEntity<?> deleteRecipeBookmark2(@AuthenticationPrincipal User userPrincipal, @PathVariable Long recipeId) {
+        try {
+            recipeBookmarkService.removeBookmark(userPrincipal.getId(), recipeId);
+            return ResponseEntity.ok().body("Bookmark removed successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("An error occurred while removing the bookmark.");
+        }
     }
 
 

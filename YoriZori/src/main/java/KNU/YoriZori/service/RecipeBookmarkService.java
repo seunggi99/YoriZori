@@ -46,6 +46,13 @@ public class RecipeBookmarkService {
         recipeBookmarkRepository.deleteById(bookmarkId);
     }
 
+    @Transactional
+    public void removeBookmark(Long userId, Long recipeId) {
+        RecipeBookmark bookmark = recipeBookmarkRepository.findByUserIdAndRecipeId(userId, recipeId)
+                .orElseThrow(() -> new RuntimeException("Bookmark not found"));
+        recipeBookmarkRepository.delete(bookmark);
+    }
+
     // 북마크 레시피 조회
     @Transactional(readOnly = true)
     public List<RecipeBookmark> findBookmarksByUser(Long userId) {
