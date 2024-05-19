@@ -9,7 +9,11 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -266,9 +270,24 @@ public class RecipeService {
         }
     }
 
+    @Cacheable("dailyRecipes")
+    public List<Recipe> getDailyRecipes() {
+        return getRandomRecipes(9);
+    }
+
+    @CacheEvict(value = "dailyRecipes", allEntries = true)
+    @Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행
+    public void evictDailyRecipesCache() {
+        // 캐시를 무효화하고 새로운 레시피 목록을 로드
+    }
+
+    @CachePut(value = "dailyRecipes")
+    @Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행
+    public List<Recipe> updateDailyRecipes() {
+        return getRandomRecipes(9);
+    }
+
     public List<Recipe> getRandomRecipes(int count) {
-        List<Recipe> allRecipes = recipeRepository.findAll();
-        Collections.shuffle(allRecipes); // 레시피 목록을 무작위로 섞음
-        return allRecipes.stream().limit(count).collect(Collectors.toList()); // 지정된 개수만큼 반환
+        return recipeRepository.findRandomRecipes(count);
     }
 }

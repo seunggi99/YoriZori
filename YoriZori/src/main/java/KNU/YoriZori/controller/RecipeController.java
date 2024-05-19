@@ -7,6 +7,7 @@ import KNU.YoriZori.dto.IngredientInfoDto;
 import KNU.YoriZori.dto.RecipeDetailsDto;
 import KNU.YoriZori.dto.UserFilteredRecipeDetailsDto;
 import KNU.YoriZori.dto.UserFilteredRecipeDto;
+import KNU.YoriZori.service.RecipeBookmarkService;
 import KNU.YoriZori.service.RecipeService;
 import KNU.YoriZori.service.RecipeStorageService;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 public class RecipeController {
     private final RecipeService recipeService;
     private final RecipeStorageService storageService;
+    private final RecipeBookmarkService recipeBookmarkService;
     // 레시피, 재료 추가
     @PostMapping("/import-recipes")
     public ResponseEntity<String> uploadJsonData(@RequestParam("file") MultipartFile file) {
@@ -112,15 +114,18 @@ public class RecipeController {
     }
 
     @GetMapping("/recommendations")
-    public ResponseEntity<List<UserFilteredRecipeDto>> getTodayRecommendations(@AuthenticationPrincipal User userPrincipal) {
-        List<UserFilteredRecipeDto> recommendations = recipeService.getRandomRecipes(9).stream()
+    public ResponseEntity<List<UserFilteredRecipeDto2>> getTodayRecommendations(@AuthenticationPrincipal User userPrincipal) {
+        List<UserFilteredRecipeDto2> recommendations = recipeService.getDailyRecipes().stream()
                 .map(recipe -> {
                     Long recipeId = recipe.getId();
                     Long fridgeId = userPrincipal.getFridge().getId();
                     List<Ingredient> insufficientIngredients = recipeService.findInsufficientIngredient(recipeId, fridgeId);
-                    return new UserFilteredRecipeDto(
+                    boolean check = recipeBookmarkService.isRecipeBookmarked(userPrincipal.getId(),recipeId);
+
+                    return new UserFilteredRecipeDto2(
                             recipe.getId(),
                             recipe.getName(),
+                            check,
                             recipe.getBookmarkCount(),
                             recipe.getImageUrl(),
                             recipe.getCategory().getId(),
@@ -146,4 +151,17 @@ public class RecipeController {
         private String categoryName;
     }
 
+    @Data
+    @AllArgsConstructor
+    private static class UserFilteredRecipeDto2 {
+        private Long id;
+        private String name;
+        private boolean bookmarkCheck;
+        private int bookmarkCount;
+        private String imageUrl;
+        private Long categoryId;
+        private String categoryName;
+        private int insufficientIngredientsCount;
+        private List<IngredientInfoDto> insufficientIngredients;
+    }
 }
