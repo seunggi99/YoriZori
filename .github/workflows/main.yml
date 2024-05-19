@@ -13,7 +13,7 @@ env:
   AWS_CODE_DEPLOY_APPLICATION: cd-application-yorizori    # 기억해두라고 했던 애플리케이션 이름
   AWS_CODE_DEPLOY_GROUP: cd-publish-yorizori      # 기억해두라고 했던 배포 그룹 이름
 
-  jobs:
+jobs:
   build-with-gradle:
     runs-on: ubuntu-20.04   # ubuntu ver
     steps:
@@ -26,6 +26,15 @@ env:
       with:
         java-version: '17'
         distribution: 'corretto'
+        
+    - uses: actions/checkout@v2
+    - run: touch ./src/main/resources/application.yml
+    - run: echo "${{secrets.APPLICATION}}" > ./src/main/resources/application.yml
+    - uses: actions/upload-artifact@v2
+      with:
+        name: application.yml
+        path: ./src/main/resources/application.yml
+        
     - name: gradlew에 실행 권한 부여
       run: chmod +x ./gradlew
     - name: 프로젝트 빌드
@@ -33,9 +42,9 @@ env:
     - name: AWS credential 설정
       uses: aws-actions/configure-aws-credentials@v1
       with:
-       aws-region: ${{ env.AWS_REGION }}
-       aws-access-key-id: ${{ secrets.CICD_ACCESS_KEY }}
-       aws-secret-access-key: ${{ secrets.CICD_SECRET_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+        aws-access-key-id: ${{ secrets.CICD_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.CICD_SECRET_KEY }}
     - name: S3에 업로드
       run: aws deploy push --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} --ignore-hidden-files --s3-location s3://${{ env.AWS_CODE_BUCKET_NAME }}/cicdDir/$GITHUB_SHA.zip --source .
     - name: EC2에 배포
