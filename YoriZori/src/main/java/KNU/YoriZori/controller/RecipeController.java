@@ -1,7 +1,9 @@
 package KNU.YoriZori.controller;
 
+import KNU.YoriZori.domain.Ingredient;
 import KNU.YoriZori.domain.Recipe;
 import KNU.YoriZori.domain.User;
+import KNU.YoriZori.dto.IngredientInfoDto;
 import KNU.YoriZori.dto.RecipeDetailsDto;
 import KNU.YoriZori.dto.UserFilteredRecipeDetailsDto;
 import KNU.YoriZori.dto.UserFilteredRecipeDto;
@@ -107,6 +109,30 @@ public class RecipeController {
     public ResponseEntity<?> updateRecipeBookmarkCount(@PathVariable Long recipeId, @RequestBody int count) {
         recipeService.updateBookmarkCount(recipeId, count);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/recommendations")
+    public ResponseEntity<List<UserFilteredRecipeDto>> getTodayRecommendations(@AuthenticationPrincipal User userPrincipal) {
+        List<UserFilteredRecipeDto> recommendations = recipeService.getRandomRecipes(9).stream()
+                .map(recipe -> {
+                    Long recipeId = recipe.getId();
+                    Long fridgeId = userPrincipal.getFridge().getId();
+                    List<Ingredient> insufficientIngredients = recipeService.findInsufficientIngredient(recipeId, fridgeId);
+                    return new UserFilteredRecipeDto(
+                            recipe.getId(),
+                            recipe.getName(),
+                            recipe.getBookmarkCount(),
+                            recipe.getImageUrl(),
+                            recipe.getCategory().getId(),
+                            recipe.getCategory().getName(),
+                            insufficientIngredients.size(), // 부족한 재료 없음
+                            insufficientIngredients.stream()
+                                    .map(ingredient -> new IngredientInfoDto(ingredient.getId(), ingredient.getName()))
+                                    .collect(Collectors.toList()) // 부족한 재료 목록 없음
+                    );
+                })
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(recommendations);
     }
 
     @Data

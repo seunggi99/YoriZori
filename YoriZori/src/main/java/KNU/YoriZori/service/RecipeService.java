@@ -2,22 +2,23 @@ package KNU.YoriZori.service;
 
 import KNU.YoriZori.controller.RecipeController;
 import KNU.YoriZori.domain.*;
-import KNU.YoriZori.dto.IngredientInfoDto;
-import KNU.YoriZori.dto.RecipeDetailsDto;
-import KNU.YoriZori.dto.UserFilteredRecipeDetailsDto;
-import KNU.YoriZori.dto.UserFilteredRecipeDto;
+import KNU.YoriZori.dto.*;
 import KNU.YoriZori.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -263,5 +264,11 @@ public class RecipeService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public List<Recipe> getRandomRecipes(int count) {
+        List<Recipe> allRecipes = recipeRepository.findAll();
+        Collections.shuffle(allRecipes); // 레시피 목록을 무작위로 섞음
+        return allRecipes.stream().limit(count).collect(Collectors.toList()); // 지정된 개수만큼 반환
     }
 }
