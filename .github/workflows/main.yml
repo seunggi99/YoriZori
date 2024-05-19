@@ -1,4 +1,4 @@
-ame: CICD
+name: CICD
 run-name: Running
 on:
   push:
