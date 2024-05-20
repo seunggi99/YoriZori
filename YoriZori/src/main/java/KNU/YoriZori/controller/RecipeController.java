@@ -140,6 +140,24 @@ public class RecipeController {
         return ResponseEntity.ok(recommendations);
     }
 
+    @GetMapping("/recommendations/guest")
+    public ResponseEntity<List<UserFilteredRecipeDto3>> getTodayRecommendations2() {
+        List<UserFilteredRecipeDto3> recommendations = recipeService.getDailyRecipes().stream()
+                .map(recipe -> {
+                    Long recipeId = recipe.getId();
+
+                    return new UserFilteredRecipeDto3(
+                            recipe.getId(),
+                            recipe.getName(),
+                            recipe.getBookmarkCount(),
+                            recipe.getImageUrl(),
+                            recipe.getCategory().getId(),
+                            recipe.getCategory().getName()
+                    );
+                })
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(recommendations);
+    }
     @Data
     @AllArgsConstructor
     private static class RecipeDto {
@@ -163,5 +181,16 @@ public class RecipeController {
         private String categoryName;
         private int insufficientIngredientsCount;
         private List<IngredientInfoDto> insufficientIngredients;
+    }
+
+    @Data
+    @AllArgsConstructor
+    private static class UserFilteredRecipeDto3 {
+        private Long id;
+        private String name;
+        private int bookmarkCount;
+        private String imageUrl;
+        private Long categoryId;
+        private String categoryName;
     }
 }
