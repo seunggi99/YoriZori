@@ -17,4 +17,5 @@ public class UserFilteredRecipeDto {
     private String categoryName;
     private int insufficientIngredientsCount;
     private List<IngredientInfoDto> insufficientIngredients;
+    private int ownedIngredientsCount;
 }

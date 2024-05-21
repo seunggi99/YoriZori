@@ -21,10 +21,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -135,6 +132,11 @@ public class RecipeService {
                     .map(ingredient -> new IngredientInfoDto(ingredient.getId(), ingredient.getName()))
                     .collect(Collectors.toList());
 
+            // 보유한 재료 개수 계산
+            int ownedIngredientsCount = recipe.getIngredients().size() - insufficientIngredients.size();
+            System.out.println("_____________________");
+            System.out.println(recipe.getIngredients().size());
+            System.out.println(ownedIngredientsCount);
             // UserFilteredRecipeDto 객체 생성 및 추가
             filteredRecipes.add(new UserFilteredRecipeDto(
                     recipe.getId(),
@@ -144,9 +146,11 @@ public class RecipeService {
                     recipe.getCategory().getId(),
                     recipe.getCategory().getName(),
                     insufficientIngredients.size(), // 부족한 재료의 개수
-                    ingredientInfoDtos         // 부족한 재료 ID 목록
+                    ingredientInfoDtos,         // 부족한 재료 ID 목록
+                    ownedIngredientsCount
             ));
         }
+        //filteredRecipes.sort(Comparator.comparingInt(UserFilteredRecipeDto::getOwnedIngredientsCount).reversed());
 
         return filteredRecipes;
     }
