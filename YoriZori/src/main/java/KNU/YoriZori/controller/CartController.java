@@ -25,7 +25,7 @@ public class CartController {
                         cart.getId(),
                         cart.getIngredient().getId(),
                         cart.getIngredient().getName(),
-                        cart.getIngredient().getImageUrl(),
+                        cart.getIngredient().getCategory().getImageUrl(),
                         cart.isPinned()
                 ))
                 .collect(Collectors.toList());

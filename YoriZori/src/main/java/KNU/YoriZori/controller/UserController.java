@@ -71,7 +71,7 @@ public class UserController {
                 .map(avoidIngredient -> new AvoidIngredientResponseDto(
                         avoidIngredient.getId(),
                         avoidIngredient.getIngredient().getId(),
-                        avoidIngredient.getIngredient().getImageUrl(),
+                        avoidIngredient.getIngredient().getCategory().getImageUrl(),
                         avoidIngredient.getIngredient().getCategoryId(),
                         avoidIngredient.getIngredient().getName()
                 ))
