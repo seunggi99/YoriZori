@@ -23,7 +23,7 @@ public class IngredientController {
                         ingredient.getId(),
                         ingredient.getName(),
                         ingredient.getDefaultExpDate(),
-                        ingredient.getImageUrl(),
+                        ingredient.getCategory().getImageUrl(),
                         ingredient.getCategoryId(),
                         ingredient.getCategory().getName()
                 ))

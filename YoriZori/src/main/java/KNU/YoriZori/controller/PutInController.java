@@ -61,7 +61,7 @@ public class PutInController {
                         putIn.getPutDate(),
                         putIn.getStoragePlace(),
                         putIn.getIngredient().getId(),
-                        putIn.getIngredient().getImageUrl(),
+                        putIn.getIngredient().getCategory().getImageUrl(),
                         putIn.getIngredient().getCategoryId(),
                         putIn.getIngredient().getCategory().getName(),
                         putIn.getIngredient().getName()

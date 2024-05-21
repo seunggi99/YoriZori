@@ -18,6 +18,8 @@ public class IngredientCategory {
 
     private String name;
 
+    private String ImageUrl;
+
     @JsonIgnore
     @OneToMany(mappedBy = "category")
     private List<Ingredient> ingredients = new ArrayList<>();
