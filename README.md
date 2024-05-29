@@ -11,6 +11,7 @@
 - 사용자 냉장고의 재료 관리: 재료 추가, 업데이트 및 삭제 기능.
 - 재료 소비기한 디데이 제공.
 - 냉장고 속 재료들을 기반으로 한 레시피 추천.
+- 오늘의 추천 레시피
 - 식약처 API 연동을 통해 레시피 데이터 가져오기 및 필요 재료 목록 정규화.
 - 레시피 별 부족한 재료 개수와 목록 제공
 - 장바구니 기능
@@ -23,24 +24,29 @@
 - **Spring Security**: 애플리케이션 보안을 위한 프레임워크.
 - **JWT (JSON Web Tokens)**: 인증 및 인가 처리.
 - **Spring Data JPA**: 데이터베이스 상호작용.
+- **Spring Scheduler, Spring Cache**: 오늘의 추천 레시피 갱신
 - **MySQL**: 애플리케이션 데이터 저장을 위한 데이터베이스.
 - **AWS EC2**: 애플리케이션 호스팅.
 - **AWS RDS**: MySQL 데이터베이스 관리.
 - **식약처 API**: 레시피 데이터 가져오기.
 
+## ERD
+<img width="854" alt="image" src="https://github.com/seunggi99/YoriZori/assets/94459503/b1280339-21b0-42f8-9c08-40b13215c6e0">
+
 ## 시작하기
 ### 사전 준비
-- JDK 11 이상
+- JDK 17
 - MySQL
 - Gradle
 
 ### 설치 방법
 1.  레포지토리 클론:
    ```sh
-   git clone https://github.com/yourusername/YoriZori-backend.git
-   cd YoriZori-backend
+   git clone https://github.com/seunggi99/YoriZori.git
+   cd YoriZori
    ```
 2.	application.properties 파일을 업데이트하여 MySQL 데이터베이스 자격 증명 및 기타 설정을 입력합니다.
+   
 3.	Gradle을 사용하여 프로젝트 빌드:
    ```sh
    ./gradlew build
